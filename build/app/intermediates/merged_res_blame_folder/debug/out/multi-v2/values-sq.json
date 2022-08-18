@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/brandyncronin/AndroidStudioProjects/Kryfto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-sq/values-sq.xml",
+            "outputFile": "/Users/brandyncronin/Documents/GitHub/Kryfto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-sq/values-sq.xml",
             "map": [
                 {
                     "source": "/Users/brandyncronin/.gradle/caches/transforms-3/601d4158b382ad9f634d3bbb23a34c83/transformed/jetified-play-services-basement-18.0.0/res/values-sq/values.xml",
