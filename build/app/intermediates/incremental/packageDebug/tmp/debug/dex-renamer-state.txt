@@ -1,0 +1,4 @@
+#Thu Aug 18 13:22:15 NZST 2022
+base.0=/Users/brandyncronin/AndroidStudioProjects/Kryfto/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
