@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 #Tue Aug 30 10:20:22 NZST 2022
 base.0=/Users/brandyncronin/Documents/GitHub/Kryfto/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+=======
+#Tue Aug 23 19:24:29 NZST 2022
+base.0=C\:\\Users\\terkrub\\Desktop\\laitong\\website\\Kryfto\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+>>>>>>> c5e72a5a89f3a4ef85740777a9c012526fdc5853
 renamed.0=classes.dex
 path.0=classes.dex

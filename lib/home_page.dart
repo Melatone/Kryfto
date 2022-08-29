@@ -35,6 +35,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+ 
+showOverlay(BuildContext context){
+  OverlayState? overlayState = Overlay.of(context);
+  OverlayEntry overlayEntry = OverlayEntry(builder: ((context) {
+    return Center(child: Login()
+    );
+  
+  })
+  );
+
+overlayState?.insert(overlayEntry);
+}
+
   @override
   Widget build(BuildContext context) {
     return 
@@ -60,11 +74,9 @@ primary: Theme.of(context).primaryColor,
                 ),
                 
               
-              child: const Text("Login" ,style: TextStyle(
-                fontSize: 40,
-              ),), 
+              child:  Text("Login" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () {  
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+               showOverlay(context);
               },),
               const Spacer(),
               ElevatedButton(
@@ -78,9 +90,7 @@ primary: Theme.of(context).primaryColorLight,
                 ),
                 
               
-              child: const Text("Register" ,style: TextStyle(
-                fontSize: 40,
-              ),), 
+              child:  Text("Register" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () { 
                 
                },),
@@ -93,4 +103,5 @@ primary: Theme.of(context).primaryColorLight,
       
     ;
   }
+  
 }
