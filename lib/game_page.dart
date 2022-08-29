@@ -52,11 +52,9 @@ primary: Theme.of(context).primaryColor,
                 ),
                 
               
-              child: const Text("Join" ,style: TextStyle(
-                fontSize: 40,
-              ),), 
+              child:  Text("Join" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () {  
-               Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
+             
               },),
               const Spacer(),
               ElevatedButton(
@@ -70,11 +68,9 @@ primary: Theme.of(context).primaryColorLight,
                 ),
                 
               
-              child: const Text("Create" ,style: TextStyle(
-                fontSize: 40,
-              ),), 
+              child:  Text("Create" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () { 
-                
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
                },),
               
             
@@ -90,9 +86,7 @@ primary: Theme.of(context).primaryColorDark,
                 ),
                 
               
-              child: const Text("Log Out" ,style: TextStyle(
-                fontSize: 30,
-              ),), 
+              child:  Text("Log Out" ,textAlign: TextAlign.center ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),), 
               onPressed: () { 
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));;
                },),
