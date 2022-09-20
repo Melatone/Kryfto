@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kryfto/map_page.dart';
-
+import 'map_select_page.dart';
 import 'home_page.dart';
 import 'theme.dart';
 
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       
-      body: const MapScreen(),
+      body: const MapSelectScreen(),
        // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

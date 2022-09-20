@@ -39,9 +39,10 @@ dependencies:
   dio: ^4.0.0
   flutter_polyline_points: ^0.2.6
   google_maps_flutter: ^2.0.2
-  geolocator: ^8.0.1
+  geolocator: ^9.0.1
   flutter_launcher_icons: ^0.10.0
   socket_io_client: ^2.0.0
+  location: ^4.4.0
 
 dev_dependencies:
 flutter_launcher_icons: ^0.10.0

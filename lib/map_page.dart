@@ -6,6 +6,7 @@ import 'package:geolocator_android/geolocator_android.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
+import 'package:location/location.dart';
 import 'theme.dart';
 
 class MapScreen extends StatelessWidget {
@@ -37,6 +38,23 @@ class _MapPageState extends State<MapPage> {
    late GoogleMapController _mapController;
  
   Set<Marker> markers = {};
+  
+  LocationData? currentLocation;
+void getLocation(){
+Location location = Location();
+
+location.getLocation().then((location) {
+currentLocation = location;
+},
+);
+
+}
+
+@override
+void initState(){
+  getLocation();
+  super.initState();
+}
 
   @override
   void dispose(){
@@ -101,12 +119,14 @@ onMapCreated:(GoogleMapController controller){
       floatingActionButton: FloatingActionButton(
        
         onPressed: () async {
-Position position = await  _determinePosition();
+
          _mapController.animateCamera(
-CameraUpdate.newCameraPosition(CameraPosition(target:LatLng(position.latitude,position.longitude),zoom: 20)));
+CameraUpdate.newCameraPosition(CameraPosition(target:LatLng(currentLocation!.latitude!,currentLocation!.longitude!),zoom: 20)));
 
 markers.clear();
-markers.add(Marker(markerId:const MarkerId("Current Location"),position: LatLng(position.latitude,position.longitude) ));
+markers.add(Marker(markerId:const MarkerId("Current Location"),
+position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
+ ));
 setState(() {
   
 });
@@ -119,25 +139,5 @@ setState(() {
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
-Future<Position> _determinePosition() async  {
-  bool serviceEnabled;
-  LocationPermission permission;
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-if(!serviceEnabled){
-  return Future.error('Location services is disabled');
 
-}
-permission = await Geolocator.checkPermission();
-
-if(permission ==LocationPermission.denied){
-  return Future.error('Location permission denied');
-
-}
-if(permission == LocationPermission.deniedForever){
-return Future.error('Location permissions denied forever.');
-}
-
-Position position  =  await Geolocator.getCurrentPosition();
-return position;
-}
 }
