@@ -3,17 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-
-class loginpage extends StatefulWidget {
-  const loginpage({super.key});
+class registerpage extends StatefulWidget {
+  const registerpage({super.key});
 
   @override
-  State<loginpage> createState() => _loginpageState();
+  State<registerpage> createState() => _registerpageState();
 }
 
-class _loginpageState extends State<loginpage> {
+class _registerpageState extends State<registerpage> {
   final userController = TextEditingController();
   final passController = TextEditingController();
+  final conpassController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +52,17 @@ class _loginpageState extends State<loginpage> {
                 ),
               ),
             ),
+            Text("Confirm Password"),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: TextFormField(
+                controller: conpassController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter your Password',
+                ),
+              ),
+            ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -61,7 +73,7 @@ class _loginpageState extends State<loginpage> {
               ),
               onPressed: () {},
               child: const Text(
-                "Login",
+                "Register",
                 style: TextStyle(
                   fontSize: 20,
                 ),

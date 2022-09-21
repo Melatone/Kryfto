@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'map_select_page.dart';
 import 'home_page.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: theme(),
       
-      home: const MyHomePage(title: 'Kryfto'),
+    home: const MyHomePage(title: 'Kryfto'),
+     
     );
   }
 }
