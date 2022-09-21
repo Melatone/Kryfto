@@ -28,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     // TODO: implement initState
     socket = IO.io(
-        "http://10.0.2.2:5000",
+        "https://kryfto.herokuapp.com/",
         IO.OptionBuilder()
             .setQuery({'chatID': widget.user.username})
             .setTransports(["websocket"])
