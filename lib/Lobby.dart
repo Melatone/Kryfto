@@ -26,7 +26,7 @@ class _LobbyState extends State<Lobby> {
     super.initState();
 
     socket = IO.io(
-        "http://10.0.2.2:5000",
+        "https://kryfto.herokuapp.com/",
         IO.OptionBuilder()
             .setTransports(["websocket"])
             .disableAutoConnect()
