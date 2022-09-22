@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'login_page.dart';
+import 'registerpage.dart';
 import 'theme.dart';
 
 class HomePage extends StatelessWidget {
@@ -76,7 +77,7 @@ primary: Theme.of(context).primaryColor,
               
               child:  Text("Login" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () {  
-               showOverlay(context);
+               Navigator.push(context, MaterialPageRoute(builder: (context) => const loginpage()));
               },),
               const Spacer(),
               ElevatedButton(
@@ -92,7 +93,8 @@ primary: Theme.of(context).primaryColorLight,
               
               child:  Text("Register" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () { 
-                
+                               Navigator.push(context, MaterialPageRoute(builder: (context) => const registerpage()));
+
                },),
               
             
