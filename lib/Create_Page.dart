@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'Lobby.dart';
+import 'Model/User.dart';
 
 
 
@@ -12,7 +13,7 @@ class createpage extends StatefulWidget {
   State<createpage> createState() => _createpageState();
 }
 
-class _HomepageState extends State<createpage> {
+class _createpageState extends State<createpage> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -120,11 +121,11 @@ class Screen extends StatelessWidget {
         ),
 
         Expanded(
-          child: SizedBox(width: 40,
+          child: SizedBox(width: 80,
             child: Center(
               child: ListWheelScrollView.useDelegate(
                 onSelectedItemChanged: (value) => print(value),
-                itemExtent: 50,
+                itemExtent: 70,
                 perspective: 0.01,
                 diameterRatio: 0.4,
                 physics: const FixedExtentScrollPhysics(),
@@ -156,11 +157,11 @@ class Screen extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: SizedBox(width: 40,
+          child: SizedBox(width: 80,
             child: Center(
               child: ListWheelScrollView.useDelegate(
                 onSelectedItemChanged: (value) => print(value),
-                itemExtent: 50,
+                itemExtent: 70,
                 perspective: 0.01,
                 diameterRatio: 0.4,
                 physics: const FixedExtentScrollPhysics(),
@@ -184,12 +185,12 @@ class Screen extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: SizedBox(width: 40,
+          child: SizedBox(width: 80,
             child: Center(
               child: ListWheelScrollView.useDelegate(
                 onSelectedItemChanged: (value) => print(value),
-                itemExtent: 50,
-                perspective: 0.01,
+                itemExtent: 70,
+                perspective: 0.009,
                 diameterRatio: 0.4,
                 physics: const FixedExtentScrollPhysics(),
                 childDelegate: ListWheelChildBuilderDelegate(
@@ -221,7 +222,8 @@ class Screen extends StatelessWidget {
           onPressed: () {
             {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Lobby()));
+                  MaterialPageRoute(builder: (context) =>  Lobby(user: User
+                  (username: "username", password: "password", roomcode: "roomcode"))));
             }
           },
         ),
@@ -247,7 +249,7 @@ class MyMinutes extends StatelessWidget {
           child: Text(
             mins.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 20.0,
+              fontSize: 40.0,
               color: const Color(0xFFFF0000),
               fontWeight: FontWeight.bold,
             ),
@@ -270,7 +272,7 @@ class Numhiders extends StatelessWidget {
           child: Text(
             numhiders.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 20.0,
+              fontSize: 40.0,
               color: const Color(0xFFFF0000),
               fontWeight: FontWeight.bold,
             ),
@@ -293,7 +295,7 @@ class Numseekers extends StatelessWidget {
           child: Text(
             numseekers.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 20.0,
+              fontSize: 40.0,
               color: const Color(0xFFFF0000),
               fontWeight: FontWeight.bold,
             ),

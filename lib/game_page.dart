@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kryfto/Create_Page.dart';
 import 'package:kryfto/home_page.dart';
+import 'package:kryfto/join_page.dart';
 import 'package:kryfto/map_page.dart';
 
 import 'theme.dart';
@@ -54,7 +56,7 @@ primary: Theme.of(context).primaryColor,
               
               child:  Text("Join" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () {  
-             
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const JoinPage()));
               },),
               const Spacer(),
               ElevatedButton(
@@ -70,7 +72,7 @@ primary: Theme.of(context).primaryColorLight,
               
               child:  Text("Create" ,style: GoogleFonts.ubuntu(textStyle: TextStyle(fontSize: 40,fontWeight: FontWeight.bold)),), 
               onPressed: () { 
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const createpage()));
                },),
               
             

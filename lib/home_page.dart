@@ -38,17 +38,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
  
-showOverlay(BuildContext context){
-  OverlayState? overlayState = Overlay.of(context);
-  OverlayEntry overlayEntry = OverlayEntry(builder: ((context) {
-    return Center(child: loginpage()
-    );
-  
-  })
-  );
 
-overlayState?.insert(overlayEntry);
-}
 
   @override
   Widget build(BuildContext context) {

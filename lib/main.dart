@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       
-      body: const MapSelectScreen(),
+      body: Center(child: Home()),
        // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
