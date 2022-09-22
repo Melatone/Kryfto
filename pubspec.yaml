@@ -43,6 +43,7 @@ dependencies:
   flutter_launcher_icons: ^0.10.0
   socket_io_client: ^2.0.0
   location: ^4.4.0
+  maps_toolkit: ^2.0.1
 
 dev_dependencies:
 flutter_launcher_icons: ^0.10.0

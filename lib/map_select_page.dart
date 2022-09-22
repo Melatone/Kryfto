@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
+import 'map_page.dart';
 import 'theme.dart';
 
 class MapSelectScreen extends StatelessWidget {
@@ -51,7 +52,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
 
   int _polygonIdCounter =1 ;
   int _markerIdCounter =1;
-
+  int _boundaryIDCounter =1; 
 
 LocationData? currentLocation;
 void getLocation(){
@@ -61,6 +62,13 @@ location.getLocation().then((location) {
 currentLocation = location;
 },
 );
+location.onLocationChanged.listen(
+  (newLoc) { 
+    currentLocation= newLoc;
+    setState(() {
+      
+    });
+  });
 
 }
 
@@ -217,7 +225,8 @@ setState(() {
   content: Text("Please confirm your Boundary Selection"),
   actions:[
     CupertinoDialogAction(child:Text("Cancel"),isDestructiveAction: true,onPressed:() => Navigator.pop(context)),
-    CupertinoDialogAction(child:Text("Confirm"),isDefaultAction: true,),
+    CupertinoDialogAction(child:Text("Confirm"),isDefaultAction: true, onPressed:() =>  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MapPage(points:lat_lng)))
+),
   ]));
 });
 },

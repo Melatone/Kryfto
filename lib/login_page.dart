@@ -9,6 +9,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class loginpage extends StatefulWidget {
   const loginpage({super.key});
+  
+
 
   @override
   State<loginpage> createState() => _loginpageState();
@@ -18,8 +20,10 @@ class _loginpageState extends State<loginpage> {
   final userController = TextEditingController();
   final passController = TextEditingController();
   late IO.Socket socket;
+  final _formKey = GlobalKey<FormState>();
   bool checkLogin = false;
-
+  bool wrongPass = false;
+  bool wrongUser = false;
 
   @override
   void initState() {
@@ -40,6 +44,13 @@ class _loginpageState extends State<loginpage> {
         });
 
       }
+      if(data['Status'] == "Wrong password"){
+wrongPass = true;
+print(wrongPass);
+      }
+      if(data['Status'] == "Username Incorrect"){
+wrongUser = true;
+      }
       
     });
 
@@ -53,7 +64,7 @@ class _loginpageState extends State<loginpage> {
    
     return Scaffold(
       
-      body: Padding(
+      body: Form(key: _formKey,child:Padding(
         padding: const EdgeInsets.fromLTRB(10, 50, 10, 0),
         child: SingleChildScrollView(
           child: Column(children: [
@@ -76,6 +87,14 @@ class _loginpageState extends State<loginpage> {
                   border: OutlineInputBorder(),
                   labelText: 'Enter your username',
                 ),
+                validator: (value) {
+if(wrongUser){
+  return "Incorrect Username";
+}
+else{
+  return null;
+}
+                },
               ),
             ),
             Text("Password"),
@@ -83,14 +102,24 @@ class _loginpageState extends State<loginpage> {
               padding: const EdgeInsets.all(20),
               child: TextFormField(
                 obscureText: true,
+                
                 controller: passController,
                 autocorrect: false,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter your Password',
                 ),
-              ),
+              validator: (value) {
+if(wrongPass){
+  return "Incorrect Password";
+}
+else{
+  return null;
+}
+              }),
+              
             ),
+            
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -100,7 +129,9 @@ class _loginpageState extends State<loginpage> {
                 primary: Theme.of(context).primaryColor,
               ),
               onPressed: () {
+if(_formKey.currentState!.validate()){
 
+}
                 socket.emit(
                   'login',
                   json.encode({
@@ -120,6 +151,7 @@ class _loginpageState extends State<loginpage> {
           ]),
         ),
       ),
+    )
     );
   }
 }
