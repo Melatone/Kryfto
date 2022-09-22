@@ -99,7 +99,7 @@ class _LobbyState extends State<Lobby> {
                     Text(
                       'Kryfto',
                       style: GoogleFonts.righteous(
-                        fontSize: 60.0,
+                        fontSize: height * 0.075,
                         color: const Color(0xFFFF0000),
                       ),
                     ),
@@ -108,7 +108,7 @@ class _LobbyState extends State<Lobby> {
                       child: Text(
                         'Room code: ' + roomcode,
                         style: GoogleFonts.righteous(
-                          fontSize: 20.0,
+                          fontSize: height * 0.025,
                           color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       ),
@@ -119,7 +119,7 @@ class _LobbyState extends State<Lobby> {
                       child: Text(
                         'Players',
                         style: GoogleFonts.righteous(
-                          fontSize: 40.0,
+                          fontSize: height * 0.06,
                           color: Colors.white,
                         ),
                       ),
@@ -136,12 +136,12 @@ class _LobbyState extends State<Lobby> {
                           ),
                         ),
                         child: ListView.builder(
-                            itemCount: playersItems.length,
+                            itemCount: 1, //playersItems.length,
                             itemBuilder: (context, index) {
-                              var currentPlayer = playersItems[index];
+                              //var currentPlayer = playersItems[index];
                               return Players(
-                                Username: currentPlayer.Username,
-                                seeker: currentPlayer.Seeker,
+                                Username: "terkrub", //currentPlayer.Username,
+                                seeker: true, //currentPlayer.Seeker,
                               );
                             })),
                     Padding(
@@ -149,7 +149,7 @@ class _LobbyState extends State<Lobby> {
                       child: Text(
                         'Choose Your Role',
                         style: GoogleFonts.righteous(
-                          fontSize: 40.0,
+                          fontSize: height * 0.05,
                           color: Colors.white,
                         ),
                       ),
@@ -195,7 +195,7 @@ class _LobbyState extends State<Lobby> {
                                   child: Text(
                                     'Hider',
                                     style: GoogleFonts.righteous(
-                                      fontSize: 30.0,
+                                      fontSize: height * 0.04,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -243,7 +243,7 @@ class _LobbyState extends State<Lobby> {
                                 child: Text(
                                   'Seeker',
                                   style: GoogleFonts.righteous(
-                                    fontSize: 30.0,
+                                    fontSize: height * 0.04,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -294,7 +294,7 @@ class Players extends StatelessWidget {
                   child: Text(
                     Username,
                     style: GoogleFonts.righteous(
-                      fontSize: 25.0,
+                      fontSize: height * 0.03,
                       color: Color.fromARGB(255, 0, 0, 0),
                     ),
                     textAlign: TextAlign.left,
@@ -308,7 +308,7 @@ class Players extends StatelessWidget {
                   child: Text(
                     seeker ? "Seeker" : "Hidder",
                     style: GoogleFonts.righteous(
-                      fontSize: 25.0,
+                      fontSize: height * 0.03,
                       color: Color.fromARGB(255, 0, 0, 0),
                     ),
                     textAlign: TextAlign.right,
