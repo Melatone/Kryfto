@@ -170,7 +170,9 @@ if(isMapCreated){
         elevation: 1,
         ),
 
-      body:  GoogleMap(
+      body: currentLocation ==null ? 
+      Center(child: Text("Loading...",style: GoogleFonts.righteous(textStyle: TextStyle(fontSize: 25, color: Theme.of(context).primaryColor) )))
+      : GoogleMap(
         markers: markers,
         polygons: polygons,
         zoomControlsEnabled: false,
