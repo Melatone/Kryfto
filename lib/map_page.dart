@@ -1,8 +1,10 @@
 
 
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
@@ -11,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
+import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
@@ -25,6 +28,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+
   List<LatLng> points;
   _MapPageState(this.points);
   static const initCameraPosition = CameraPosition(
@@ -38,8 +42,30 @@ class _MapPageState extends State<MapPage> {
   Set<Polygon> polygons = {};
 
  LocationData? currentLocation;
+  
 
 
+Duration time = Duration(minutes: 30);
+late Timer timer;
+Duration? current;
+
+
+  void startTimer(){
+    timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
+    Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
+    current = time;
+  }
+  void countDown(){
+    final second = 1;
+    setState(() {
+
+      final seconds = time.inSeconds - second;
+      time = Duration(seconds: seconds);
+    });
+  }
+
+
+ 
 void getLocation(){
 Location location = Location();
 
@@ -61,20 +87,17 @@ location.onLocationChanged.listen(
 @override
 void initState(){
   
+  
   getLocation();
- 
+
+
   super.initState();
 }
-// LatLng passLocation(){
-//   LatLng pin = LatLng(0,0);
-//   Location location = Location();
-//   location.getLocation().then((location){
-// pin = LatLng(currentLocation!.latitude!,currentLocation!.longitude!);
-// return pin;
 
-//   });
-//   return pin;
-// }
+
+
+
+
 void _drawPolygon(){
   
   
@@ -109,14 +132,37 @@ polygons.add(Polygon(
    });
       
  }
+showOverlay(BuildContext context) async {
+  OverlayState? overlayState =Overlay.of(context);
+OverlayEntry overlayEntry = OverlayEntry(builder: (context){
+ return CupertinoAlertDialog(
+    title: Text("Boundary Breached"),
+  content: Text("Please return the boundary or you will be Eliminated."),
+  );
+});
+  overlayState?.insert(overlayEntry);
 
-bool inBounds(){
+
+await Future.delayed(Duration(seconds:5));
+
+overlayEntry.remove();
+}
+void inBounds(){
    List<mp.LatLng> mpPoints = <mp.LatLng>[];
+   bool inside = true;
   for(int i =0; i < points.length;i++){
    
     mpPoints.add(mp.LatLng(points[i].latitude,points[i].longitude));
   }
-  return mp.PolygonUtil.containsLocation(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), mpPoints, true);
+
+    inside = mp.PolygonUtil.containsLocation(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), mpPoints, true);
+if(!inside){
+  setState(() {
+    showOverlay(context);
+  });
+}
+
+  
 }
 
 
@@ -147,7 +193,7 @@ void setMapStyle(String mapStyle){
 
 if(isMapCreated){
   changeMapMode();
-
+ 
   
 }
 
@@ -156,26 +202,27 @@ if(isMapCreated){
 
     return  Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        leading: IconButton(onPressed: (){ Navigator.push(context, MaterialPageRoute(builder: (context) => const GamePage()));
-        },
-        icon: const Icon(Icons.arrow_back_ios)),
-        centerTitle: true,
-        title: Text("59:34:19",style: GoogleFonts.righteous(textStyle: TextStyle(fontSize: 45, color: Theme.of(context).backgroundColor) )),
-        backgroundColor: Color(0xaaea2a3d),
-        elevation: 0,
-        ),
+      appBar: AppBar(centerTitle: true,
+      title: Text(time.toString().substring(0,time.toString().length-7),
+      style: GoogleFonts.righteous(textStyle:TextStyle(color: Theme.of(context).backgroundColor,
+      fontSize: 35,
+      ))),
+      backgroundColor: ui.Color.fromARGB(199, 234, 42, 61),
+      elevation: 0,),
 
-      body:  currentLocation ==null ?
-       Center(child: Text("Loading..."))
-      : GoogleMap(
+      body: currentLocation ==null ? 
+      Center(child: Text("Loading...",style: GoogleFonts.righteous(textStyle: TextStyle(fontSize: 25, color: Theme.of(context).primaryColor) )))
+      :GoogleMap(
         markers: markers,
         polygons: polygons,
         zoomControlsEnabled: true,
         myLocationButtonEnabled: false,
         
 initialCameraPosition: initCameraPosition,
+
 onMapCreated:(GoogleMapController controller){
+  startTimer();
+  
   _mapController = controller;
   isMapCreated = true;
   changeMapMode();
@@ -186,17 +233,7 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
   setState(() {
     
      _drawPolygon();
-     if(!inBounds()){
-       showDialog(context: context, builder: (context) => CupertinoAlertDialog(
-    title: Text("Boundary Breached"),
-  content: Text("Please return the boundary or you will be Eliminated."),
-  actions:[
-    CupertinoDialogAction(child:Text("OK"),isDestructiveAction: true,),
-    
-
      
-  ]));
-  }
   });
  
   

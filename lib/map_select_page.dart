@@ -1,5 +1,6 @@
 
 
+
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
+import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
 
@@ -98,6 +100,21 @@ void changeMapMode(){
 void setMapStyle(String mapStyle){
   _mapController.setMapStyle(mapStyle);
 }
+
+showOverlay(BuildContext context) async {
+  OverlayState? overlayState =Overlay.of(context);
+OverlayEntry overlayEntry = OverlayEntry(builder: (context){
+ return Center(child:Count(start:10));
+});
+  overlayState?.insert(overlayEntry);
+
+
+await Future.delayed(Duration(seconds:Count(start:10).start));
+
+overlayEntry.remove();
+}
+
+
  void _setMarker(LatLng point){
    final String markerIdVal = 'marker_$_markerIdCounter';
    final String markerTitleVal = 'Corner $_markerIdCounter';
@@ -224,8 +241,29 @@ setState(() {
     title: Text("Confirm"),
   content: Text("Please confirm your Boundary Selection"),
   actions:[
+  
     CupertinoDialogAction(child:Text("Cancel"),isDestructiveAction: true,onPressed:() => Navigator.pop(context)),
-    CupertinoDialogAction(child:Text("Confirm"),isDefaultAction: true, onPressed:() =>  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MapPage(points:lat_lng)))
+    CupertinoDialogAction(child:Text("Confirm"),isDefaultAction: true, onPressed:(){
+      
+      if(lat_lng.length>2){
+       showOverlay(context); 
+        Navigator.pop(context);
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MapPage(points:lat_lng))); 
+   
+
+    }
+    
+    else{
+      Navigator.pop(context);
+      showDialog(context: context, builder: (context) => CupertinoAlertDialog(
+    title: Text("Invalid Boundary"),
+  content: Text("Please create a boundary with at least 3 corners."),
+  actions:[
+    CupertinoDialogAction(child:Text("OK"),isDefaultAction: true,onPressed:() => Navigator.pop(context))
+      
+  ]));
+    }
+    }
 ),
   ]));
 });
