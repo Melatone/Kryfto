@@ -8,7 +8,6 @@ import 'map_select_page.dart';
 import 'home_page.dart';
 import 'theme.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -23,9 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      
-    home: const MyHomePage(title: 'Kryfto'),
-     
+      home: registerpage(),
     );
   }
 }
@@ -49,9 +46,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- 
-  
-  
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -61,10 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      
-      body:  Compass(),
-       // This trailing comma makes auto-formatting nicer for build methods.
+      body: Compass(),
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
-
