@@ -11,8 +11,9 @@ import 'Model/User.dart';
 
 class ChatPage extends StatefulWidget {
   final User user;
-
-  const ChatPage({Key? key, required this.user}) : super(key: key);
+  final IO.Socket socket;
+  const ChatPage({Key? key, required this.user, required this.socket})
+      : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -22,20 +23,12 @@ class _ChatPageState extends State<ChatPage> {
   List<Message> messages = [];
   TextEditingController msgInputController = TextEditingController();
   final ScrollController scrollController = ScrollController();
-  late IO.Socket socket;
 
   @override
   void initState() {
     // TODO: implement initState
-    socket = IO.io(
-        "https://kryfto.herokuapp.com/",
-        IO.OptionBuilder()
-            .setQuery({'chatID': widget.user.username})
-            .setTransports(["websocket"])
-            .disableAutoConnect()
-            .build());
 
-    socket.on('chat message', (msg) {
+    widget.socket.on('chat message', (msg) {
       Map<String, dynamic> data = json.decode(msg);
       this.setState(() {
         messages.add(Message(data['text'], data['senderUsername'],
@@ -49,7 +42,6 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     super.initState();
-    socket.connect();
   }
 
   @override
@@ -120,7 +112,7 @@ class _ChatPageState extends State<ChatPage> {
       duration: Duration(milliseconds: 600),
       curve: Curves.ease,
     );
-    socket.emit(
+    widget.socket.emit(
         'chat message',
         json.encode({
           'senderUsername': widget.user.username,

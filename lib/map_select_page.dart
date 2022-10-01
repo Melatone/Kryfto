@@ -10,26 +10,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'Model/User.dart';
 import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
 
 class MapSelectScreen extends StatelessWidget {
-  const MapSelectScreen({super.key});
-
+  const MapSelectScreen({super.key, required this.socket, required this.user});
+  final IO.Socket socket;
+  final User user;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      home: MapSelectPage(),
+      home: MapSelectPage(
+        socket: socket,
+        user: user,
+      ),
     );
   }
 }
 
 class MapSelectPage extends StatefulWidget {
-  const MapSelectPage({super.key});
-
+  const MapSelectPage({super.key, required this.socket, required this.user});
+  final IO.Socket socket;
+  final User user;
   @override
   State<MapSelectPage> createState() => _MapPageSelectState();
 }
@@ -140,8 +147,13 @@ class _MapPageSelectState extends State<MapSelectPage> {
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const GamePage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GamePage(
+                              socket: widget.socket,
+                              user: widget.user,
+                            )));
               },
               icon: const Icon(Icons.arrow_back_ios)),
           centerTitle: true,

@@ -2,15 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kryfto/Model/User.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-
-
 class loginpage extends StatefulWidget {
-  const loginpage({super.key});
-  
-
+  const loginpage({super.key, required this.socket});
+  final IO.Socket socket;
 
   @override
   State<loginpage> createState() => _loginpageState();
@@ -19,7 +17,6 @@ class loginpage extends StatefulWidget {
 class _loginpageState extends State<loginpage> {
   final userController = TextEditingController();
   final passController = TextEditingController();
-  late IO.Socket socket;
   final _formKey = GlobalKey<FormState>();
   bool checkLogin = false;
   bool wrongPass = false;
@@ -28,43 +25,40 @@ class _loginpageState extends State<loginpage> {
   @override
   void initState() {
     // TODO: implement initState
-    socket = IO.io(
-        "https://kryfto.herokuapp.com/",
-        IO.OptionBuilder()
-            .setTransports(["websocket"])
-            .disableAutoConnect()
-            .build());
 
-    socket.on('login', (data){
+    widget.socket.on('login', (data) {
       print(data);
-      if(data['Status'] == "Success"){
+      if (data['Status'] == "Success") {
         this.setState(() {
           Navigator.of(context).pop();
-          Navigator.of(context).push(MaterialPageRoute(builder: ((context) => const GamePage())));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: ((context) => GamePage(
+                    socket: widget.socket,
+                    user: User(
+                        username: userController.text,
+                        password: passController.text,
+                        roomcode: null),
+                  ))));
         });
-
       }
-      if(data['Status'] == "Wrong password"){
-wrongPass = true;
-print(wrongPass);
+      if (data['Status'] == "Wrong password") {
+        wrongPass = true;
+        print(wrongPass);
       }
-      if(data['Status'] == "Username Incorrect"){
-wrongUser = true;
+      if (data['Status'] == "Username Incorrect") {
+        wrongUser = true;
       }
-      
     });
 
     super.initState();
-    socket.connect();
   }
-
 
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
-      
-      body: Form(key: _formKey,child:Padding(
+        body: Form(
+      key: _formKey,
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 50, 10, 0),
         child: SingleChildScrollView(
           child: Column(children: [
@@ -74,26 +68,25 @@ wrongUser = true;
                         fontSize: 80, color: Theme.of(context).primaryColor))),
             Image.asset(
               "images/runawayy.png",
-              width: 200, height: 200,
+              width: 200,
+              height: 200,
             ),
             Text("Username"),
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextFormField(
                 controller: userController,
-                
                 autocorrect: false,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter your username',
                 ),
                 validator: (value) {
-if(wrongUser){
-  return "Incorrect Username";
-}
-else{
-  return null;
-}
+                  if (wrongUser) {
+                    return "Incorrect Username";
+                  } else {
+                    return null;
+                  }
                 },
               ),
             ),
@@ -101,25 +94,21 @@ else{
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextFormField(
-                obscureText: true,
-                
-                controller: passController,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter your Password',
-                ),
-              validator: (value) {
-if(wrongPass){
-  return "Incorrect Password";
-}
-else{
-  return null;
-}
-              }),
-              
+                  obscureText: true,
+                  controller: passController,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter your Password',
+                  ),
+                  validator: (value) {
+                    if (wrongPass) {
+                      return "Incorrect Password";
+                    } else {
+                      return null;
+                    }
+                  }),
             ),
-            
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -129,16 +118,13 @@ else{
                 primary: Theme.of(context).primaryColor,
               ),
               onPressed: () {
-if(_formKey.currentState!.validate()){
-
-}
-                socket.emit(
-                  'login',
-                  json.encode({
-                    'Username': userController.text,
-                    'Password' : passController.text
-                  }));
-                
+                if (_formKey.currentState!.validate()) {}
+                widget.socket.emit(
+                    'login',
+                    json.encode({
+                      'Username': userController.text,
+                      'Password': passController.text
+                    }));
               },
               child: const Text(
                 "Login",
@@ -146,12 +132,10 @@ if(_formKey.currentState!.validate()){
                   fontSize: 20,
                 ),
               ),
-              
             )
           ]),
         ),
       ),
-    )
-    );
+    ));
   }
 }

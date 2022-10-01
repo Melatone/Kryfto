@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:kryfto/Compass.dart';
 import 'package:kryfto/countdown.dart';
@@ -7,14 +9,15 @@ import 'package:kryfto/registerpage.dart';
 import 'map_select_page.dart';
 import 'home_page.dart';
 import 'theme.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  MyApp({Key? key}) : super(key: key);
+  late IO.Socket socket;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      home: registerpage(),
+      home: HomePage(),
     );
   }
 }

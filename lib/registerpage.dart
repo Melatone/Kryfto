@@ -3,55 +3,57 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:kryfto/Model/User.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'game_page.dart';
 
 class registerpage extends StatefulWidget {
-  const registerpage({super.key});
-
+  const registerpage({super.key, required this.socket});
+  final IO.Socket socket;
   @override
   State<registerpage> createState() => _registerpageState();
 }
+
 class _registerpageState extends State<registerpage> {
   final userController = TextEditingController();
   final passController = TextEditingController();
   final conpassController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool userExists = false;
-  late IO.Socket socket;
 
   @override
   void initState() {
     // TODO: implement initState
-    socket = IO.io(
-        "https://kryfto.herokuapp.com/",
-        IO.OptionBuilder()
-            .setTransports(["websocket"])
-            .disableAutoConnect()
-            .build());
 
-    socket.on('register', (data){
+    widget.socket.on('register', (data) {
       print(data);
-      if(data['Status'] == "Success"){
+      if (data['Status'] == "Success") {
         this.setState(() {
           Navigator.of(context).pop();
-          Navigator.of(context).push(MaterialPageRoute(builder: ((context) => const GamePage())));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: ((context) => GamePage(
+                    socket: widget.socket,
+                    user: User(
+                        username: userController.text,
+                        password: passController.text,
+                        roomcode: null),
+                  ))));
         });
-        if(data['Status'] == 'user_exists'){
+        if (data['Status'] == 'user_exists') {
           userExists = true;
         }
-    }
+      }
     });
-
     super.initState();
-    socket.connect();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(key: _formKey, child: Padding(
+        body: Form(
+      key: _formKey,
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 50, 10, 0),
         child: SingleChildScrollView(
           child: Column(children: [
@@ -61,7 +63,8 @@ class _registerpageState extends State<registerpage> {
                         fontSize: 80, color: Theme.of(context).primaryColor))),
             Image.asset(
               "images/runawayy.png",
-              width: 175, height: 175,
+              width: 175,
+              height: 175,
             ),
             Text("Username"),
             Padding(
@@ -72,11 +75,10 @@ class _registerpageState extends State<registerpage> {
                   border: OutlineInputBorder(),
                   labelText: 'Enter your username',
                 ),
-                validator: (value){
-                  if(userExists){
+                validator: (value) {
+                  if (userExists) {
                     return 'User already exists';
-                  }
-                  else{
+                  } else {
                     return null;
                   }
                 },
@@ -104,12 +106,11 @@ class _registerpageState extends State<registerpage> {
                   border: OutlineInputBorder(),
                   labelText: 'Enter your Password',
                 ),
-                validator:(value) {
-                  if(value!= passController.value.text){
-                  return 'Passwords do not match';
-                  }
-                else
-                return null;
+                validator: (value) {
+                  if (value != passController.value.text) {
+                    return 'Passwords do not match';
+                  } else
+                    return null;
                 },
               ),
             ),
@@ -122,21 +123,15 @@ class _registerpageState extends State<registerpage> {
                 primary: Theme.of(context).primaryColor,
               ),
               onPressed: () {
-                
-                socket.emit(
-                  'register',
-                  json.encode({
-                    'Username': userController.text,
-                    'Password' : passController.text
-                  }));
-                  
-                  
-if(_formKey.currentState!.validate()){
+                widget.socket.emit(
+                    'register',
+                    json.encode({
+                      'Username': userController.text,
+                      'Password': passController.text
+                    }));
 
-                }
-
+                if (_formKey.currentState!.validate()) {}
               },
-
               child: const Text(
                 "Register",
                 style: TextStyle(
@@ -147,7 +142,6 @@ if(_formKey.currentState!.validate()){
           ]),
         ),
       ),
-    )
-    );
+    ));
   }
 }

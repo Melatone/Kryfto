@@ -11,29 +11,23 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Lobby extends StatefulWidget {
   final User user;
-  const Lobby({Key? key, required this.user}) : super(key: key);
+  final IO.Socket socket;
+  Lobby({
+    Key? key,
+    required this.user,
+    required this.socket,
+  }) : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
 }
 
 class _LobbyState extends State<Lobby> {
-  String roomcode = "";
-  late IO.Socket socket;
-  List<PlayerModel> playersItems = [];
-
+  List<PlayerModel> playersItems = [PlayerModel("terkrub", false)];
   @override
   void initState() {
     super.initState();
 
-    socket = IO.io(
-        "https://kryfto.herokuapp.com/",
-        IO.OptionBuilder()
-            .setTransports(["websocket"])
-            .disableAutoConnect()
-            .build());
-
-    socket.on("new join", (msg) {
-      print(msg['Role'].runtimeType);
+    widget.socket.on("new join", (msg) {
       if (msg['Status'] == 'Success') {
         this.setState(() {
           playersItems.add(PlayerModel(
@@ -44,7 +38,7 @@ class _LobbyState extends State<Lobby> {
       }
     });
 
-    socket.on("join room", (msg) {
+    widget.socket.on("join room", (msg) {
       msg.forEach((element) {
         print(element['Role'].runtimeType);
         this.setState(() {
@@ -53,28 +47,26 @@ class _LobbyState extends State<Lobby> {
       });
     });
 
-    socket.on("change role", (msg) {
-      this.setState(() {
-        playersItems.forEach((element) {
-          if (element.Username == msg['Username']) {
-            print(element.Seeker);
-
-            element.Seeker = msg['Role'];
-            print(element.Seeker);
-          }
-        });
+    widget.socket.on("change role", (msg) async {
+      final result = json.decode(msg);
+      this.setState(await () {
+        playersItems.forEach(
+          (element) {
+            if (element.Username == result['Username']) {
+              element.Seeker = result['Role'];
+            }
+          },
+        );
       });
     });
 
     super.initState();
-    socket.connect();
   }
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: const Color(0xFFD20000),
       body: Center(
@@ -106,7 +98,7 @@ class _LobbyState extends State<Lobby> {
                     Padding(
                       padding: EdgeInsets.only(top: height * 0.02),
                       child: Text(
-                        'Room code: ' + roomcode,
+                        'Room code: ' + widget.user.roomcode,
                         style: GoogleFonts.righteous(
                           fontSize: height * 0.025,
                           color: Color.fromARGB(255, 0, 0, 0),
@@ -136,12 +128,12 @@ class _LobbyState extends State<Lobby> {
                           ),
                         ),
                         child: ListView.builder(
-                            itemCount: 1, //playersItems.length,
+                            itemCount: playersItems.length,
                             itemBuilder: (context, index) {
-                              //var currentPlayer = playersItems[index];
+                              var currentPlayer = playersItems[index];
                               return Players(
-                                Username: "terkrub", //currentPlayer.Username,
-                                seeker: true, //currentPlayer.Seeker,
+                                Username: currentPlayer.Username,
+                                seeker: currentPlayer.Seeker,
                               );
                             })),
                     Padding(
@@ -164,11 +156,11 @@ class _LobbyState extends State<Lobby> {
                                 left: width * 0.07, right: width * 0.05),
                             child: InkWell(
                                 onTap: () {
-                                  socket.emit(
+                                  widget.socket.emit(
                                       "change role",
                                       json.encode({
-                                        'Code': "D3G2G",
-                                        'Username': "terkrub",
+                                        'Code': widget.user.roomcode,
+                                        'Username': widget.user.username,
                                         'Role': false,
                                       }));
                                 },
@@ -205,18 +197,11 @@ class _LobbyState extends State<Lobby> {
                             padding: EdgeInsets.only(left: width * 0.0),
                             child: InkWell(
                               onTap: () {
-                                socket.emit(
+                                widget.socket.emit(
                                     "change role",
                                     json.encode({
-                                      'Code': "D3G2G",
-                                      'Username': "terkrub",
-                                      'Role': true,
-                                    }));
-                                socket.emit(
-                                    "join room",
-                                    json.encode({
-                                      'Code': "D3G2G",
-                                      'Username': "terkrub",
+                                      'Code': widget.user.roomcode,
+                                      'Username': widget.user.username,
                                       'Role': true,
                                     }));
                               },

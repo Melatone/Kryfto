@@ -1,19 +1,45 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Lobby.dart';
 import 'Model/User.dart';
-
-
+import 'Model/player.dart';
 
 class createpage extends StatefulWidget {
-  const createpage({Key? key}) : super(key: key);
-
+  const createpage({Key? key, required this.socket, required this.user})
+      : super(key: key);
+  final IO.Socket socket;
+  final User user;
   @override
   State<createpage> createState() => _createpageState();
 }
 
 class _createpageState extends State<createpage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    widget.socket.on('create room', (data) {
+      print(data);
+      if (data['Status'] == "Success") {
+        this.setState(() {
+          widget.user.roomcode = data['Code'];
+          print(data['Code']);
+          Navigator.of(context).pop();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => Lobby(
+                    user: widget.user,
+                    socket: widget.socket,
+                  )));
+        });
+      }
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -81,7 +107,10 @@ class _createpageState extends State<createpage> {
                         color: const Color(0xFFD5D0D0),
                         borderRadius: BorderRadius.circular(33.0),
                       ),
-                      child: const Screen(),
+                      child: Screen(
+                        socket: widget.socket,
+                        user: widget.user,
+                      ),
                     ),
                   ],
                 )),
@@ -93,146 +122,151 @@ class _createpageState extends State<createpage> {
 }
 
 class Screen extends StatelessWidget {
-  const Screen({Key? key}) : super(key: key);
+  const Screen({Key? key, required this.socket, required this.user})
+      : super(key: key);
+  final IO.Socket socket;
+  final User user;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                    ),
-        Text(
-          'Gamerules',
-          style: GoogleFonts.righteous(
-            fontSize: 40.0,
-            color: const Color(0xFFFF0000),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: height * 0.01, bottom: height * 0.01),
           ),
-        ),
-        Text(
-          'Time Limit',
-          style: GoogleFonts.righteous(
-            fontSize: 30.0,
-            color: const Color(0xFFFF0000),
+          Text(
+            'Gamerules',
+            style: GoogleFonts.righteous(
+              fontSize: 40.0,
+              color: const Color(0xFFFF0000),
+            ),
           ),
-        ),
-
-        Expanded(
-          child: SizedBox(width: 80,
-            child: Center(
-              child: ListWheelScrollView.useDelegate(
-                onSelectedItemChanged: (value) => print(value),
-                itemExtent: 70,
-                perspective: 0.01,
-                diameterRatio: 0.4,
-                physics: const FixedExtentScrollPhysics(),
-                childDelegate: ListWheelChildBuilderDelegate(
+          Text(
+            'Time Limit',
+            style: GoogleFonts.righteous(
+              fontSize: 30.0,
+              color: const Color(0xFFFF0000),
+            ),
+          ),
+          Expanded(
+            child: SizedBox(
+              width: 80,
+              child: Center(
+                child: ListWheelScrollView.useDelegate(
+                  onSelectedItemChanged: (value) => print(value),
+                  itemExtent: 70,
+                  perspective: 0.01,
+                  diameterRatio: 0.4,
+                  physics: const FixedExtentScrollPhysics(),
+                  childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 151,
                     builder: (context, index) {
                       return MyMinutes(
                         mins: index,
                       );
                     },
-                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-        
-        Text(
-          'Minutes',
-          style: GoogleFonts.righteous(
-            fontSize: 20.0,
-            color: const Color(0xFFFF0000),
+          Text(
+            'Minutes',
+            style: GoogleFonts.righteous(
+              fontSize: 20.0,
+              color: const Color(0xFFFF0000),
+            ),
           ),
-        ),
-        Text(
-          'Number of Hiders',
-          style: GoogleFonts.righteous(
-            fontSize: 30.0,
-            color: const Color(0xFFFF0000),
+          Text(
+            'Number of Hiders',
+            style: GoogleFonts.righteous(
+              fontSize: 30.0,
+              color: const Color(0xFFFF0000),
+            ),
           ),
-        ),
-        Expanded(
-          child: SizedBox(width: 80,
-            child: Center(
-              child: ListWheelScrollView.useDelegate(
-                onSelectedItemChanged: (value) => print(value),
-                itemExtent: 70,
-                perspective: 0.01,
-                diameterRatio: 0.4,
-                physics: const FixedExtentScrollPhysics(),
-                childDelegate: ListWheelChildBuilderDelegate(
+          Expanded(
+            child: SizedBox(
+              width: 80,
+              child: Center(
+                child: ListWheelScrollView.useDelegate(
+                  onSelectedItemChanged: (value) => print(value),
+                  itemExtent: 70,
+                  perspective: 0.01,
+                  diameterRatio: 0.4,
+                  physics: const FixedExtentScrollPhysics(),
+                  childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 21,
                     builder: (context, index) {
                       return Numhiders(
                         numhiders: index,
                       );
                     },
-                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-        Text(
-          'Number of Seekers',
-          style: GoogleFonts.righteous(
-            fontSize: 30.0,
-            color: const Color(0xFFFF0000),
+          Text(
+            'Number of Seekers',
+            style: GoogleFonts.righteous(
+              fontSize: 30.0,
+              color: const Color(0xFFFF0000),
+            ),
           ),
-        ),
-        Expanded(
-          child: SizedBox(width: 80,
-            child: Center(
-              child: ListWheelScrollView.useDelegate(
-                onSelectedItemChanged: (value) => print(value),
-                itemExtent: 70,
-                perspective: 0.009,
-                diameterRatio: 0.4,
-                physics: const FixedExtentScrollPhysics(),
-                childDelegate: ListWheelChildBuilderDelegate(
+          Expanded(
+            child: SizedBox(
+              width: 80,
+              child: Center(
+                child: ListWheelScrollView.useDelegate(
+                  onSelectedItemChanged: (value) => print(value),
+                  itemExtent: 70,
+                  perspective: 0.009,
+                  diameterRatio: 0.4,
+                  physics: const FixedExtentScrollPhysics(),
+                  childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 21,
                     builder: (context, index) {
                       return Numseekers(
                         numseekers: index,
                       );
                     },
-                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            minimumSize: const Size(200, 60),
-            maximumSize: const Size(200, 60),
-            primary: Theme.of(context).primaryColor,
-          ),
-          child: const Text(
-            "Confirm",
-            style: TextStyle(
-              fontSize: 30,
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0)),
+              minimumSize: const Size(200, 60),
+              maximumSize: const Size(200, 60),
+              primary: Theme.of(context).primaryColor,
             ),
+            child: const Text(
+              "Confirm",
+              style: TextStyle(
+                fontSize: 30,
+              ),
+            ),
+            onPressed: () {
+              {
+                socket.emit(
+                    'create room',
+                    json.encode({
+                      'Username': user.username,
+                    }));
+              }
+            },
           ),
-          onPressed: () {
-            {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Lobby(user: User
-                  (username: "username", password: "password", roomcode: "roomcode"))));
-            }
-          },
-        ),
-        Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.02, bottom: height * 0.01),
-                    ),
-      ],
-    ),
+          Padding(
+            padding: EdgeInsets.only(top: height * 0.02, bottom: height * 0.01),
+          ),
+        ],
+      ),
     );
   }
 }
