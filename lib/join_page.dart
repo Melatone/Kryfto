@@ -132,7 +132,7 @@ class _JoinState extends State<Join> {
                   'join room',
                   json.encode({
                     'Username': widget.user.username,
-                    'Code': roomController.text,
+                    'Code': roomController.text.toUpperCase(),
                     'Role': false,
                   }));
             },
