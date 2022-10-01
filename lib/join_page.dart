@@ -55,24 +55,28 @@ class _JoinState extends State<Join> {
     List<PlayerModel> playersItems = [];
 
     widget.socket.on("join room", (msg) {
-      msg.forEach((element) {
-        print(element['Role'].runtimeType);
-        this.setState(() {
-          playersItems.add(PlayerModel(element['Username'], element['Role']));
-        });
-      });
+      final Map<String, dynamic> result = jsonDecode(jsonEncode(msg));
 
-      this.setState(() {
-        playersItems.add(PlayerModel(widget.user.username, false));
-        Navigator.of(context).pop();
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => Lobby(
-                  user: widget.user,
-                  socket: widget.socket,
-                  playersItems: playersItems,
-                  roomcode: roomController.text,
-                )));
-      });
+      if (result['Status'] == 'Success') {
+        result['Players'].forEach((element) {
+          print(element['Role'].runtimeType);
+          this.setState(() {
+            playersItems.add(PlayerModel(element['Username'], element['Role']));
+          });
+        });
+
+        this.setState(() {
+          playersItems.add(PlayerModel(widget.user.username, false));
+          Navigator.of(context).pop();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => Lobby(
+                    user: widget.user,
+                    socket: widget.socket,
+                    playersItems: playersItems,
+                    roomcode: roomController.text.toUpperCase(),
+                  )));
+        });
+      }
     });
 
     super.initState();

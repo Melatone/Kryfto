@@ -128,6 +128,7 @@ class _LobbyState extends State<Lobby> {
                               return Players(
                                 Username: currentPlayer.Username,
                                 seeker: currentPlayer.Seeker,
+                                user: widget.user,
                               );
                             })),
                     Padding(
@@ -242,8 +243,13 @@ class _LobbyState extends State<Lobby> {
 }
 
 class Players extends StatelessWidget {
-  const Players({Key? key, required this.Username, required this.seeker})
+  const Players(
+      {Key? key,
+      required this.Username,
+      required this.seeker,
+      required this.user})
       : super(key: key);
+  final User user;
   final bool seeker;
   final String Username;
   @override
@@ -274,7 +280,9 @@ class Players extends StatelessWidget {
                     Username,
                     style: GoogleFonts.righteous(
                       fontSize: height * 0.03,
-                      color: Color.fromARGB(255, 0, 0, 0),
+                      color: Username == user.username
+                          ? Color.fromARGB(255, 255, 3, 3)
+                          : Color.fromARGB(255, 0, 0, 0),
                     ),
                     textAlign: TextAlign.left,
                   ),
