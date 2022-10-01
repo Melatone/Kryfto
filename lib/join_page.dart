@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kryfto/Lobby.dart';
 import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'Model/User.dart';
+import 'Model/player.dart';
 import 'game_page.dart';
 import 'map_select_page.dart';
 import 'home_page.dart';
@@ -44,6 +48,35 @@ class Join extends StatefulWidget {
 
 class _JoinState extends State<Join> {
   final roomController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    List<PlayerModel> playersItems = [];
+
+    widget.socket.on("join room", (msg) {
+      msg.forEach((element) {
+        print(element['Role'].runtimeType);
+        this.setState(() {
+          playersItems.add(PlayerModel(element['Username'], element['Role']));
+        });
+      });
+
+      this.setState(() {
+        playersItems.add(PlayerModel(widget.user.username, false));
+        Navigator.of(context).pop();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => Lobby(
+                  user: widget.user,
+                  socket: widget.socket,
+                  playersItems: playersItems,
+                  roomcode: roomController.text,
+                )));
+      });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +127,15 @@ class _JoinState extends State<Join> {
               maximumSize: const Size(130, 60),
               primary: Theme.of(context).primaryColor,
             ),
-            onPressed: () {},
+            onPressed: () {
+              widget.socket.emit(
+                  'join room',
+                  json.encode({
+                    'Username': widget.user.username,
+                    'Code': roomController.text,
+                    'Role': false,
+                  }));
+            },
           ),
           Spacer(),
         ],

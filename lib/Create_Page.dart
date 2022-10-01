@@ -27,7 +27,7 @@ class _createpageState extends State<createpage> {
       print(data);
       if (data['Status'] == "Success") {
         this.setState(() {
-          playersItems.add(PlayerModel("terkrub", false));
+          playersItems.add(PlayerModel(widget.user.username, false));
           widget.user.roomcode = data['Code'];
           print(data['Code']);
           Navigator.of(context).pop();
@@ -36,6 +36,7 @@ class _createpageState extends State<createpage> {
                     user: widget.user,
                     socket: widget.socket,
                     playersItems: playersItems,
+                    roomcode: data['Code'],
                   )));
         });
       }

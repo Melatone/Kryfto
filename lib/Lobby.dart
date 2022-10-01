@@ -12,12 +12,14 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 class Lobby extends StatefulWidget {
   final User user;
   final IO.Socket socket;
+  final String roomcode;
   List<PlayerModel> playersItems;
   Lobby(
       {Key? key,
       required this.user,
       required this.socket,
-      required this.playersItems})
+      required this.playersItems,
+      required this.roomcode})
       : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
@@ -39,19 +41,9 @@ class _LobbyState extends State<Lobby> {
       }
     });
 
-    widget.socket.on("join room", (msg) {
-      msg.forEach((element) {
-        print(element['Role'].runtimeType);
-        this.setState(() {
-          widget.playersItems
-              .add(PlayerModel(element['Username'], element['Role']));
-        });
-      });
-    });
-
-    widget.socket.on("change role", (msg) async {
+    widget.socket.on("change role", (msg) {
       final result = json.decode(msg);
-      this.setState(await () {
+      this.setState(() {
         widget.playersItems.forEach(
           (element) {
             if (element.Username == result['Username']) {
@@ -100,7 +92,7 @@ class _LobbyState extends State<Lobby> {
                     Padding(
                       padding: EdgeInsets.only(top: height * 0.02),
                       child: Text(
-                        'Room code: ' + widget.user.roomcode,
+                        'Room code: ' + widget.roomcode,
                         style: GoogleFonts.righteous(
                           fontSize: height * 0.025,
                           color: Color.fromARGB(255, 0, 0, 0),
@@ -161,7 +153,7 @@ class _LobbyState extends State<Lobby> {
                                   widget.socket.emit(
                                       "change role",
                                       json.encode({
-                                        'Code': widget.user.roomcode,
+                                        'Code': widget.roomcode,
                                         'Username': widget.user.username,
                                         'Role': false,
                                       }));
@@ -202,7 +194,7 @@ class _LobbyState extends State<Lobby> {
                                 widget.socket.emit(
                                     "change role",
                                     json.encode({
-                                      'Code': widget.user.roomcode,
+                                      'Code': widget.roomcode,
                                       'Username': widget.user.username,
                                       'Role': true,
                                     }));
