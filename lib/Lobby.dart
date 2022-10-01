@@ -12,17 +12,18 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 class Lobby extends StatefulWidget {
   final User user;
   final IO.Socket socket;
-  Lobby({
-    Key? key,
-    required this.user,
-    required this.socket,
-  }) : super(key: key);
+  List<PlayerModel> playersItems;
+  Lobby(
+      {Key? key,
+      required this.user,
+      required this.socket,
+      required this.playersItems})
+      : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
 }
 
 class _LobbyState extends State<Lobby> {
-  List<PlayerModel> playersItems = [PlayerModel("terkrub", false)];
   @override
   void initState() {
     super.initState();
@@ -30,7 +31,7 @@ class _LobbyState extends State<Lobby> {
     widget.socket.on("new join", (msg) {
       if (msg['Status'] == 'Success') {
         this.setState(() {
-          playersItems.add(PlayerModel(
+          widget.playersItems.add(PlayerModel(
             msg['Username'],
             msg['Role'],
           ));
@@ -42,7 +43,8 @@ class _LobbyState extends State<Lobby> {
       msg.forEach((element) {
         print(element['Role'].runtimeType);
         this.setState(() {
-          playersItems.add(PlayerModel(element['Username'], element['Role']));
+          widget.playersItems
+              .add(PlayerModel(element['Username'], element['Role']));
         });
       });
     });
@@ -50,7 +52,7 @@ class _LobbyState extends State<Lobby> {
     widget.socket.on("change role", (msg) async {
       final result = json.decode(msg);
       this.setState(await () {
-        playersItems.forEach(
+        widget.playersItems.forEach(
           (element) {
             if (element.Username == result['Username']) {
               element.Seeker = result['Role'];
@@ -128,9 +130,9 @@ class _LobbyState extends State<Lobby> {
                           ),
                         ),
                         child: ListView.builder(
-                            itemCount: playersItems.length,
+                            itemCount: widget.playersItems.length,
                             itemBuilder: (context, index) {
-                              var currentPlayer = playersItems[index];
+                              var currentPlayer = widget.playersItems[index];
                               return Players(
                                 Username: currentPlayer.Username,
                                 seeker: currentPlayer.Seeker,

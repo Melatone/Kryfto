@@ -17,6 +17,8 @@ class createpage extends StatefulWidget {
 }
 
 class _createpageState extends State<createpage> {
+  List<PlayerModel> playersItems = [];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -25,6 +27,7 @@ class _createpageState extends State<createpage> {
       print(data);
       if (data['Status'] == "Success") {
         this.setState(() {
+          playersItems.add(PlayerModel("terkrub", false));
           widget.user.roomcode = data['Code'];
           print(data['Code']);
           Navigator.of(context).pop();
@@ -32,6 +35,7 @@ class _createpageState extends State<createpage> {
               builder: (context) => Lobby(
                     user: widget.user,
                     socket: widget.socket,
+                    playersItems: playersItems,
                   )));
         });
       }
