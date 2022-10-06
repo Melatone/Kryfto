@@ -59,67 +59,35 @@ class _LobbyState extends State<Lobby> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+   
     return Scaffold(
-      backgroundColor: const Color(0xFFD20000),
+      appBar: AppBar(backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+       centerTitle: true, title: Text(widget.roomcode,
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 40, color: Theme.of(context).primaryColor)))),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Center(
-        child: Stack(
-          children: [
-            Positioned(
-              top: height * -0.1,
-              child: Container(
-                height: height * 0.2,
-                width: width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(33.0),
-                  color: const Color(0xFFD5D0D0),
-                ),
-              ),
-            ),
-            SizedBox(
-                width: width,
-                height: height,
-                child: Column(
+        child: Column(
                   children: <Widget>[
-                    Text(
-                      'Kryfto',
-                      style: GoogleFonts.righteous(
-                        fontSize: height * 0.075,
-                        color: const Color(0xFFFF0000),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: height * 0.02),
-                      child: Text(
-                        'Room code: ' + widget.roomcode,
-                        style: GoogleFonts.righteous(
-                          fontSize: height * 0.025,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                      child: Text(
+                    
+                    
+                    Spacer(),
+                      Text(
                         'Players',
                         style: GoogleFonts.righteous(
-                          fontSize: height * 0.06,
+                          fontSize: 30,
                           color: Colors.white,
                         ),
                       ),
-                    ),
+                    Spacer(flex:1),
                     Container(
-                        alignment: Alignment(-1.0, -0.91),
-                        width: width * 0.96,
-                        height: height * 0.5,
+                        alignment: Alignment.center,
+                        width: 350,
+                        height: 400,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD5D0D0),
-                          border: Border.all(
-                            width: 1.0,
-                            color: const Color(0xFF707070),
-                          ),
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: ListView.builder(
                             itemCount: widget.playersItems.length,
@@ -131,26 +99,23 @@ class _LobbyState extends State<Lobby> {
                                 user: widget.user,
                               );
                             })),
-                    Padding(
-                      padding: EdgeInsets.only(top: height * 0.03),
-                      child: Text(
+                    Spacer(),
+                       Text(
                         'Choose Your Role',
                         style: GoogleFonts.righteous(
-                          fontSize: height * 0.05,
-                          color: Colors.white,
+                          fontSize: 30,
+                          color: Theme.of(context).backgroundColor,
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: width * 0.9,
-                      height: height * 0.1,
-                      child: Row(
+                    
+                    Spacer(),
+                    Row(
                         children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: width * 0.07, right: width * 0.05),
-                            child: InkWell(
-                                onTap: () {
+                          
+                          Spacer(),  
+                          ElevatedButton(
+                            
+                                onPressed: () {
                                   widget.socket.emit(
                                       "change role",
                                       json.encode({
@@ -159,39 +124,27 @@ class _LobbyState extends State<Lobby> {
                                         'Role': false,
                                       }));
                                 },
-                                child: Container(
-                                  alignment: Alignment(0.01, 0.06),
-                                  width: width * 0.35,
-                                  height: height * 0.07,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(28.0),
-                                    color: const Color(0xFF242222),
-                                    border: Border.all(
-                                      width: 1.0,
-                                      color: const Color(0xFF707070),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFFFFEEEE)
-                                            .withOpacity(0.16),
-                                        offset: Offset(0, 6.0),
-                                        blurRadius: 12.0,
-                                      ),
-                                    ],
-                                  ),
+style: ElevatedButton.styleFrom(
+                               maximumSize: Size(200,100),
+                               minimumSize: Size(120,50),
+                                backgroundColor:  const Color(0xFF242222),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
+                              ),
+                              
+                          
+                                
                                   child: Text(
                                     'Hider',
                                     style: GoogleFonts.righteous(
-                                      fontSize: height * 0.04,
-                                      color: Colors.white,
+                                      fontSize: 30,
+                                      color: Theme.of(context).backgroundColor,
                                     ),
                                   ),
-                                )),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: width * 0.0),
-                            child: InkWell(
-                              onTap: () {
+                                ),
+                        
+                        Spacer(),
+                            ElevatedButton(
+                              onPressed: () {
                                 widget.socket.emit(
                                     "change role",
                                     json.encode({
@@ -200,45 +153,35 @@ class _LobbyState extends State<Lobby> {
                                       'Role': true,
                                     }));
                               },
-                              child: Container(
-                                alignment: Alignment(0.02, 0.06),
-                                width: width * 0.35,
-                                height: height * 0.07,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(28.0),
-                                  color: const Color(0xFF242222),
-                                  border: Border.all(
-                                    width: 1.0,
-                                    color: const Color(0xFF707070),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFFFEEEE)
-                                          .withOpacity(0.16),
-                                      offset: Offset(0, 6.0),
-                                      blurRadius: 12.0,
-                                    ),
-                                  ],
-                                ),
+                              style: ElevatedButton.styleFrom(
+                               maximumSize: Size(200,100),
+                               minimumSize: Size(120,50),
+                                backgroundColor:  const Color(0xFF242222),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
+                              ),
+                              
                                 child: Text(
                                   'Seeker',
                                   style: GoogleFonts.righteous(
-                                    fontSize: height * 0.04,
-                                    color: Colors.white,
+                                    fontSize: 30,
+                                    color:Theme.of(context).backgroundColor,
                                   ),
                                 ),
                               ),
-                            ),
-                          )
+                            
+                          Spacer(),
                         ],
                       ),
-                    ),
+                      Spacer(flex:8),
+                  
                   ],
-                )),
-          ],
-        ),
-      ),
-    );
+                )
+                ),
+          
+        );
+        
+      
+    
   }
 }
 
@@ -263,44 +206,35 @@ class Players extends StatelessWidget {
             height: height * 0.07,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(29.0),
-              color: Colors.white,
-              border: Border.all(
-                width: 1.0,
-                color: const Color(0xFF707070),
-              ),
+              color: Theme.of(context).backgroundColor,
+             
             ),
-            child: Stack(
+            child: Row(
+           mainAxisAlignment: MainAxisAlignment.center,
+           
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: width * 0.05,
-                      top: height * 0.015,
-                      bottom: height * 0.015),
-                  child: Text(
+                Spacer(),
+                 Text(
                     Username,
                     style: GoogleFonts.righteous(
-                      fontSize: height * 0.03,
+                      fontSize: 20,
                       color: Username == user.username
-                          ? Color.fromARGB(255, 255, 3, 3)
+                          ? Theme.of(context).primaryColor
                           : Color.fromARGB(255, 0, 0, 0),
                     ),
                     textAlign: TextAlign.left,
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: width * 0.7,
-                      top: height * 0.015,
-                      bottom: height * 0.015),
-                  child: Text(
-                    seeker ? "Seeker" : "Hidder",
+                Spacer(flex:4),
+              
+                  Text(
+                    seeker ? "Seeker" : "Hider",
                     style: GoogleFonts.righteous(
                       fontSize: height * 0.03,
                       color: Color.fromARGB(255, 0, 0, 0),
                     ),
                     textAlign: TextAlign.right,
                   ),
-                ),
+                Spacer(),
               ],
             )));
   }

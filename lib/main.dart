@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kryfto/Compass.dart';
 import 'package:kryfto/countdown.dart';
+import 'package:kryfto/game_page.dart';
 import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'package:kryfto/registerpage.dart';
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: Compass(),
+      body: Home(),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

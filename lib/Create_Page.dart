@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -50,66 +51,35 @@ class _createpageState extends State<createpage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xFFD20000),
+      
+     appBar: AppBar(backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+       centerTitle: true, title: Text("Create Room",
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 40, color: Theme.of(context).primaryColor)))),
+                    backgroundColor: Theme.of(context).primaryColor,
       body: Center(
         child: Stack(
           children: [
-            Positioned(
-              top: height * -0.1,
-              child: Container(
-                height: height * 0.2,
-                width: width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(33.0),
-                  color: const Color(0xFFD5D0D0),
-                ),
-              ),
-            ),
-            SizedBox(
-                width: width,
-                height: height,
-                child: Column(
+            
+            
+               Column(
                   children: <Widget>[
-                    Text(
-                      'Kryfto',
-                      style: GoogleFonts.righteous(
-                        fontSize: 60.0,
-                        color: const Color(0xFFFF0000),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                    ),
+                    Spacer(),
+                     Text(
+            'Gamerules',
+            style: GoogleFonts.righteous(
+              fontSize: 40.0,
+              color: Theme.of(context).backgroundColor,
+            ),
+          ),
+                    Spacer(),
                     Container(
-                      width: width * 0.96,
-                      height: height * 0.05,
+                      alignment: Alignment.center,
+                      width: 350,
+                      height: 600,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD5D0D0),
-                        borderRadius: BorderRadius.circular(33.0),
-                      ),
-                      padding: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                      child: Center(
-                        child: Text(
-                          'Create Room',
-                          style: GoogleFonts.righteous(
-                            fontSize: 20.0,
-                            color: const Color(0xFFFF0000),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                    ),
-                    Container(
-                      alignment: const Alignment(-1.0, -0.91),
-                      width: width * 0.96,
-                      height: height * 0.8,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD5D0D0),
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(33.0),
                       ),
                       child: Screen(
@@ -117,8 +87,9 @@ class _createpageState extends State<createpage> {
                         user: widget.user,
                       ),
                     ),
+                    Spacer(flex:3),
                   ],
-                )),
+                )
           ],
         ),
       ),
@@ -134,37 +105,28 @@ class Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
+    
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+       
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: height * 0.01, bottom: height * 0.01),
-          ),
-          Text(
-            'Gamerules',
-            style: GoogleFonts.righteous(
-              fontSize: 40.0,
-              color: const Color(0xFFFF0000),
-            ),
-          ),
+          
+         
+          Spacer(flex: 1),
           Text(
             'Time Limit',
             style: GoogleFonts.righteous(
               fontSize: 30.0,
-              color: const Color(0xFFFF0000),
+              color: Theme.of(context).primaryColor,
             ),
           ),
-          Expanded(
-            child: SizedBox(
-              width: 80,
-              child: Center(
-                child: ListWheelScrollView.useDelegate(
+            Container(
+              height: 70,
+               child:  ListWheelScrollView.useDelegate(
                   onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 70,
-                  perspective: 0.01,
-                  diameterRatio: 0.4,
+                  itemExtent: 80,
+                  perspective: 0.001,
+                  diameterRatio: 0.2,
                   physics: const FixedExtentScrollPhysics(),
                   childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 151,
@@ -175,32 +137,32 @@ class Screen extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
             ),
-          ),
+          
           Text(
             'Minutes',
             style: GoogleFonts.righteous(
               fontSize: 20.0,
-              color: const Color(0xFFFF0000),
+              color: Theme.of(context).primaryColor,
             ),
           ),
+          Spacer(),
           Text(
             'Number of Hiders',
             style: GoogleFonts.righteous(
               fontSize: 30.0,
-              color: const Color(0xFFFF0000),
+              color: Theme.of(context).primaryColor,
             ),
           ),
-          Expanded(
-            child: SizedBox(
-              width: 80,
-              child: Center(
-                child: ListWheelScrollView.useDelegate(
+          
+            
+            Container(
+              height: 60,
+             child: ListWheelScrollView.useDelegate(
                   onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 70,
-                  perspective: 0.01,
-                  diameterRatio: 0.4,
+                  itemExtent: 80,
+                  perspective: 0.001,
+                  diameterRatio: 0.2,
                   physics: const FixedExtentScrollPhysics(),
                   childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 21,
@@ -211,25 +173,25 @@ class Screen extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
             ),
-          ),
+            
+            
+          Spacer(),
           Text(
             'Number of Seekers',
             style: GoogleFonts.righteous(
               fontSize: 30.0,
-              color: const Color(0xFFFF0000),
+              color: Theme.of(context).primaryColor,
             ),
           ),
-          Expanded(
-            child: SizedBox(
-              width: 80,
-              child: Center(
-                child: ListWheelScrollView.useDelegate(
+          
+          Container(
+            height: 60,
+               child: ListWheelScrollView.useDelegate(
                   onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 70,
-                  perspective: 0.009,
-                  diameterRatio: 0.4,
+                  itemExtent: 80,
+                  perspective: 0.001,
+                  diameterRatio: 0.2,
                   physics: const FixedExtentScrollPhysics(),
                   childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 21,
@@ -240,9 +202,8 @@ class Screen extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
-            ),
           ),
+            Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -267,9 +228,7 @@ class Screen extends StatelessWidget {
               }
             },
           ),
-          Padding(
-            padding: EdgeInsets.only(top: height * 0.02, bottom: height * 0.01),
-          ),
+          Spacer(),
         ],
       ),
     );
@@ -288,8 +247,8 @@ class MyMinutes extends StatelessWidget {
           child: Text(
             mins.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 40.0,
-              color: const Color(0xFFFF0000),
+              fontSize: 50.0,
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -311,8 +270,8 @@ class Numhiders extends StatelessWidget {
           child: Text(
             numhiders.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 40.0,
-              color: const Color(0xFFFF0000),
+              fontSize: 50.0,
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -334,8 +293,8 @@ class Numseekers extends StatelessWidget {
           child: Text(
             numseekers.toString(),
             style: GoogleFonts.righteous(
-              fontSize: 40.0,
-              color: const Color(0xFFFF0000),
+              fontSize: 50.0,
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
             ),
           ),
