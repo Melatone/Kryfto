@@ -57,7 +57,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      body: Center(child: Column(
+      
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Spacer(),
@@ -114,6 +117,8 @@ class _HomeState extends State<Home> {
         ),
         Spacer(),
       ],
+    ),
+      ),
     );
   }
 }
