@@ -11,32 +11,30 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'Compass.dart';
 import 'Model/User.dart';
 import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
 
 class MapSelectScreen extends StatelessWidget {
-  const MapSelectScreen({super.key, required this.socket, required this.user});
-  final IO.Socket socket;
-  final User user;
+  const MapSelectScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
       home: MapSelectPage(
-        socket: socket,
-        user: user,
+        
       ),
     );
   }
 }
 
 class MapSelectPage extends StatefulWidget {
-  const MapSelectPage({super.key, required this.socket, required this.user});
-  final IO.Socket socket;
-  final User user;
+  const MapSelectPage({super.key});
+  
   @override
   State<MapSelectPage> createState() => _MapPageSelectState();
 }
@@ -147,13 +145,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => GamePage(
-                              socket: widget.socket,
-                              user: widget.user,
-                            )));
+                Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back_ios)),
           centerTitle: true,
@@ -259,7 +251,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                               Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          MapPage(
+                                                          Rose(
                                                               points:
                                                                   lat_lng)));
                                             } else {

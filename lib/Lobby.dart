@@ -155,7 +155,7 @@ style: ElevatedButton.styleFrom(
                               },
                               style: ElevatedButton.styleFrom(
                                maximumSize: Size(200,100),
-                               minimumSize: Size(120,50),
+                               minimumSize: Size(120,60),
                                 backgroundColor:  const Color(0xFF242222),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
                               ),

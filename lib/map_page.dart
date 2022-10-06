@@ -103,7 +103,7 @@ void _drawPolygon(){
   
    final String polygonIdVal = 'polygon_$_polygonIdCounter';
    _polygonIdCounter++;
-polygons.add(Polygon(
+  polygons.add(Polygon(
   polygonId: PolygonId(polygonIdVal),
   points: points,
   strokeWidth: 2,
@@ -226,6 +226,11 @@ onMapCreated:(GoogleMapController controller){
   _mapController = controller;
   isMapCreated = true;
   changeMapMode();
+  _mapController.animateCamera(CameraUpdate.newCameraPosition(
+                      CameraPosition(
+                          target: LatLng(currentLocation!.latitude!,
+                              currentLocation!.longitude!),
+                          zoom: 16)));
   markers.add(Marker(markerId:const MarkerId("Current Location"),
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),

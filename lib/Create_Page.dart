@@ -52,7 +52,8 @@ class _createpageState extends State<createpage> {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       
-     appBar: AppBar(backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+     appBar: AppBar(
+       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
        centerTitle: true, title: Text("Create Room",
             style: GoogleFonts.righteous(
                 textStyle: TextStyle(
