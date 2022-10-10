@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/map_select_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Lobby.dart';
@@ -10,10 +10,15 @@ import 'Model/User.dart';
 import 'Model/player.dart';
 
 class createpage extends StatefulWidget {
-  const createpage({Key? key, required this.socket, required this.user})
+  createpage(
+      {Key? key,
+      required this.socket,
+      required this.user,
+      required this.lat_lng})
       : super(key: key);
   final IO.Socket socket;
   final User user;
+  List<LatLng> lat_lng;
   @override
   State<createpage> createState() => _createpageState();
 }
@@ -31,7 +36,7 @@ class _createpageState extends State<createpage> {
         this.setState(() {
           playersItems.add(PlayerModel(widget.user.username, false));
           widget.user.roomcode = data['Code'];
-          print(data['Code']);
+          print(widget.lat_lng[0]);
           Navigator.of(context).pop();
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => Lobby(
@@ -52,46 +57,45 @@ class _createpageState extends State<createpage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      
-     appBar: AppBar(
-       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-       centerTitle: true, title: Text("Create Room",
-            style: GoogleFonts.righteous(
-                textStyle: TextStyle(
-                    fontSize: 40, color: Theme.of(context).primaryColor)))),
-                    backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          centerTitle: true,
+          title: Text("Create Room",
+              style: GoogleFonts.righteous(
+                  textStyle: TextStyle(
+                      fontSize: 40, color: Theme.of(context).primaryColor)))),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Center(
         child: Stack(
           children: [
-            
-            
-               Column(
-                  children: <Widget>[
-                    Spacer(),
-                     Text(
-            'Gamerules',
-            style: GoogleFonts.righteous(
-              fontSize: 40.0,
-              color: Theme.of(context).backgroundColor,
-            ),
-          ),
-                    Spacer(),
-                    Container(
-                      alignment: Alignment.center,
-                      width: 350,
-                      height: 600,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(33.0),
-                      ),
-                      child: Screen(
-                        socket: widget.socket,
-                        user: widget.user,
-                      ),
-                    ),
-                    Spacer(flex:3),
-                  ],
-                )
+            Column(
+              children: <Widget>[
+                Spacer(),
+                Text(
+                  'Gamerules',
+                  style: GoogleFonts.righteous(
+                    fontSize: 40.0,
+                    color: Theme.of(context).backgroundColor,
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  alignment: Alignment.center,
+                  width: 350,
+                  height: 600,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(33.0),
+                  ),
+                  child: Screen(
+                    socket: widget.socket,
+                    user: widget.user,
+                    lat_lng: widget.lat_lng,
+                  ),
+                ),
+                Spacer(flex: 3),
+              ],
+            )
           ],
         ),
       ),
@@ -100,20 +104,21 @@ class _createpageState extends State<createpage> {
 }
 
 class Screen extends StatelessWidget {
-  const Screen({Key? key, required this.socket, required this.user})
+  Screen(
+      {Key? key,
+      required this.socket,
+      required this.user,
+      required this.lat_lng})
       : super(key: key);
   final IO.Socket socket;
   final User user;
+  List<LatLng> lat_lng;
 
   @override
   Widget build(BuildContext context) {
-    
     return Center(
       child: Column(
-       
         children: [
-          
-         
           Spacer(flex: 1),
           Text(
             'Time Limit',
@@ -122,25 +127,24 @@ class Screen extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
           ),
-            Container(
-              height: 70,
-               child:  ListWheelScrollView.useDelegate(
-                  onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 80,
-                  perspective: 0.001,
-                  diameterRatio: 0.2,
-                  physics: const FixedExtentScrollPhysics(),
-                  childDelegate: ListWheelChildBuilderDelegate(
-                    childCount: 151,
-                    builder: (context, index) {
-                      return MyMinutes(
-                        mins: index,
-                      );
-                    },
-                  ),
-                ),
+          Container(
+            height: 70,
+            child: ListWheelScrollView.useDelegate(
+              onSelectedItemChanged: (value) => print(value),
+              itemExtent: 80,
+              perspective: 0.001,
+              diameterRatio: 0.2,
+              physics: const FixedExtentScrollPhysics(),
+              childDelegate: ListWheelChildBuilderDelegate(
+                childCount: 151,
+                builder: (context, index) {
+                  return MyMinutes(
+                    mins: index,
+                  );
+                },
+              ),
             ),
-          
+          ),
           Text(
             'Minutes',
             style: GoogleFonts.righteous(
@@ -156,28 +160,24 @@ class Screen extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
           ),
-          
-            
-            Container(
-              height: 60,
-             child: ListWheelScrollView.useDelegate(
-                  onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 80,
-                  perspective: 0.001,
-                  diameterRatio: 0.2,
-                  physics: const FixedExtentScrollPhysics(),
-                  childDelegate: ListWheelChildBuilderDelegate(
-                    childCount: 21,
-                    builder: (context, index) {
-                      return Numhiders(
-                        numhiders: index,
-                      );
-                    },
-                  ),
-                ),
+          Container(
+            height: 60,
+            child: ListWheelScrollView.useDelegate(
+              onSelectedItemChanged: (value) => print(value),
+              itemExtent: 80,
+              perspective: 0.001,
+              diameterRatio: 0.2,
+              physics: const FixedExtentScrollPhysics(),
+              childDelegate: ListWheelChildBuilderDelegate(
+                childCount: 21,
+                builder: (context, index) {
+                  return Numhiders(
+                    numhiders: index,
+                  );
+                },
+              ),
             ),
-            
-            
+          ),
           Spacer(),
           Text(
             'Number of Seekers',
@@ -186,26 +186,25 @@ class Screen extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
           ),
-          
           Container(
             height: 60,
-               child: ListWheelScrollView.useDelegate(
-                  onSelectedItemChanged: (value) => print(value),
-                  itemExtent: 80,
-                  perspective: 0.001,
-                  diameterRatio: 0.2,
-                  physics: const FixedExtentScrollPhysics(),
-                  childDelegate: ListWheelChildBuilderDelegate(
-                    childCount: 21,
-                    builder: (context, index) {
-                      return Numseekers(
-                        numseekers: index,
-                      );
-                    },
-                  ),
-                ),
+            child: ListWheelScrollView.useDelegate(
+              onSelectedItemChanged: (value) => print(value),
+              itemExtent: 80,
+              perspective: 0.001,
+              diameterRatio: 0.2,
+              physics: const FixedExtentScrollPhysics(),
+              childDelegate: ListWheelChildBuilderDelegate(
+                childCount: 21,
+                builder: (context, index) {
+                  return Numseekers(
+                    numseekers: index,
+                  );
+                },
+              ),
+            ),
           ),
-            Spacer(),
+          Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -222,11 +221,11 @@ class Screen extends StatelessWidget {
             ),
             onPressed: () {
               {
-                
                 socket.emit(
                     'create room',
                     json.encode({
                       'Username': user.username,
+                      'Boundary': lat_lng,
                     }));
               }
             },

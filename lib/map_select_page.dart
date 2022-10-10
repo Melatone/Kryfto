@@ -8,6 +8,7 @@ import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kryfto/Create_Page.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -18,23 +19,26 @@ import 'map_page.dart';
 import 'theme.dart';
 
 class MapSelectScreen extends StatelessWidget {
-  const MapSelectScreen({super.key});
-
+  const MapSelectScreen({super.key, required this.socket, required this.user});
+  final IO.Socket socket;
+  final User user;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
       home: MapSelectPage(
-        
+        socket: socket,
+        user: user,
       ),
     );
   }
 }
 
 class MapSelectPage extends StatefulWidget {
-  const MapSelectPage({super.key});
-  
+  const MapSelectPage({super.key, required this.socket, required this.user});
+  final IO.Socket socket;
+  final User user;
   @override
   State<MapSelectPage> createState() => _MapPageSelectState();
 }
@@ -251,9 +255,16 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                               Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          Rose(
+                                                          createpage(
+                                                            socket:
+                                                                widget.socket,
+                                                            user: widget.user,
+                                                            lat_lng: lat_lng,
+                                                          )));
+                                              /*Rose(
                                                               points:
                                                                   lat_lng)));
+                                                                  */
                                             } else {
                                               Navigator.pop(context);
                                               showDialog(

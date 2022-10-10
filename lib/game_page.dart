@@ -93,7 +93,10 @@ class _GameState extends State<Game> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MapSelectScreen()));
+                      builder: (context) => MapSelectScreen(
+                            socket: widget.socket,
+                            user: widget.user,
+                          )));
             },
           ),
           Spacer(),
