@@ -64,7 +64,7 @@ class _JoinState extends State<Join> {
             playersItems.add(PlayerModel(element['Username'], element['Role']));
           });
         });
-
+        print(result['Boundary'][0]);
         this.setState(() {
           playersItems.add(PlayerModel(widget.user.username, false));
           Navigator.of(context).pop();
