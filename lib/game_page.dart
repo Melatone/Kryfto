@@ -6,6 +6,7 @@ import 'package:kryfto/join_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Model/User.dart';
+import 'map_select_page.dart';
 import 'theme.dart';
 
 class GamePage extends StatelessWidget {
@@ -92,10 +93,7 @@ class _GameState extends State<Game> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => createpage(
-                            socket: widget.socket,
-                            user: widget.user,
-                          )));
+                      builder: (context) => MapSelectScreen()));
             },
           ),
           Spacer(),

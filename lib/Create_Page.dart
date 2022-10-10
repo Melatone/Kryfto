@@ -222,8 +222,7 @@ class Screen extends StatelessWidget {
             ),
             onPressed: () {
               {
-                Navigator.of(context).push(MaterialPageRoute(
-              builder: ((context) => MapSelectScreen())));
+                
                 socket.emit(
                     'create room',
                     json.encode({
