@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kryfto/map_select_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Lobby.dart';
 import 'Model/User.dart';
@@ -221,6 +222,8 @@ class Screen extends StatelessWidget {
             ),
             onPressed: () {
               {
+                Navigator.of(context).push(MaterialPageRoute(
+              builder: ((context) => MapSelectScreen())));
                 socket.emit(
                     'create room',
                     json.encode({
