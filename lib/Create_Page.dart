@@ -162,14 +162,17 @@ late int hideTime;
           ),
           Spacer(),
           Text(
-            'Hide Duration',
+
+
+            'Hide Time',
+
             style: GoogleFonts.righteous(
               fontSize: 30.0,
               color: Theme.of(context).primaryColor,
             ),
           ),
           Container(
-            height: 60,
+            height: 70,
             child: ListWheelScrollView.useDelegate(
               onSelectedItemChanged: (value) => hideTime = value,
               itemExtent: 80,
@@ -177,10 +180,10 @@ late int hideTime;
               diameterRatio: 0.2,
               physics: const FixedExtentScrollPhysics(),
               childDelegate: ListWheelChildBuilderDelegate(
-                childCount: 21,
+                childCount: 151,
                 builder: (context, index) {
-                  return Numhiders(
-                    numhiders: index,
+                  return Mytimer(
+                    timer: index,
                   );
                 },
               ),
@@ -251,9 +254,9 @@ class MyMinutes extends StatelessWidget {
   }
 }
 
-class Numhiders extends StatelessWidget {
-  int numhiders;
-  Numhiders({required this.numhiders});
+class Mytimer extends StatelessWidget {
+  int timer;
+  Mytimer({required this.timer});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -261,30 +264,7 @@ class Numhiders extends StatelessWidget {
       child: Container(
         child: Center(
           child: Text(
-            numhiders.toString(),
-            style: GoogleFonts.righteous(
-              fontSize: 50.0,
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Numseekers extends StatelessWidget {
-  int numseekers;
-  Numseekers({required this.numseekers});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Container(
-        child: Center(
-          child: Text(
-            numseekers.toString(),
+            timer.toString(),
             style: GoogleFonts.righteous(
               fontSize: 50.0,
               color: Theme.of(context).primaryColor,

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:kryfto/Compass.dart';
 import 'package:kryfto/countdown.dart';
@@ -15,6 +15,8 @@ import 'theme.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown,DeviceOrientation.portraitUp])
   runApp(MyApp());
 }
 
