@@ -13,6 +13,7 @@ import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Compass.dart';
+import 'Lobby.dart';
 import 'Model/User.dart';
 import 'countdown.dart';
 import 'map_page.dart';
@@ -240,6 +241,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                           isDefaultAction: true,
                                           onPressed: () {
                                             if (lat_lng.length > 2) {
+<<<<<<< Updated upstream
                                               setState(() {
                                                 Navigator.of(context).pop;
                                               Navigator.of(context).push(
@@ -257,6 +259,12 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                                               points:
                                                                   lat_lng)));
                                                                   */
+=======
+                                              showOverlay(context);
+                                              Navigator.pop(context);
+                                             
+                                                      
+>>>>>>> Stashed changes
                                             } else {
                                               Navigator.pop(context);
                                               showDialog(
