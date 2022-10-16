@@ -42,7 +42,7 @@ class Lobby extends StatefulWidget {
 }
 
 class _LobbyState extends State<Lobby> {
-  late List<LocationData> locations; 
+
   @override
   void initState() {
     super.initState();
@@ -71,17 +71,20 @@ class _LobbyState extends State<Lobby> {
         );
       });
     });
-    widget.socket.on("create room", (msg){
-      final result = json.decode(msg);
+   
+
+    widget.socket.on("start game", (msg){
+      final Map<String, dynamic> result = jsonDecode(jsonEncode(msg));
+      print(result['status']);
       this.setState(() {
-        if(msg['Status'] =="Success"){
+        if(msg['status'] =="Success"){
           Navigator.pop(context);
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(
                 points: widget.points, 
               
               socket: widget.socket, 
-              user: widget.user, roomInfo: RoomInfo(widget.points, widget.roomcode, locations, widget.hideLimit, widget.timeLimit),  ),
+              user: widget.user, roomInfo: RoomInfo(widget.points, widget.roomcode, widget.hideLimit, widget.timeLimit),  ),
                   )); 
         }
       });
@@ -89,6 +92,9 @@ class _LobbyState extends State<Lobby> {
 
     super.initState();
   }
+
+
+  
 
     showOverlay(BuildContext context) async {
     OverlayState? overlayState = Overlay.of(context);
@@ -220,7 +226,9 @@ style: ElevatedButton.styleFrom(
                       Spacer(),
                       ElevatedButton(
                               onPressed: () {
-                                 
+                                 widget.socket.emit("start game",jsonEncode({
+                                   'Code':widget.roomcode
+                                 }));
                               },
                               style: ElevatedButton.styleFrom(
                                maximumSize: Size(200,100),

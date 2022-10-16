@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
+
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +83,7 @@ location.getLocation().then((location) {
   widget.socket.emit("player location",jsonEncode({
     'Username:': widget.user.username,
     'Code': widget.user.roomcode,
-    'Location': currentLocation,
+    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
 
   print(currentLocation);
@@ -95,7 +95,7 @@ location.onLocationChanged.listen(
     widget.socket.emit("player location",jsonEncode({
     'Username:': widget.user.username,
     'Code': widget.user.roomcode,
-    'Location': newLoc,
+    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
     setState(() {
       
@@ -257,7 +257,11 @@ infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
   
   setState(() {
-    widget.roomInfo.playerLocations.forEach(((element) => _setMarker(LatLng(element!.latitude!,element!.longitude!))));
+    widget.socket.on("player location", (msg){
+    msg = jsonDecode(msg);
+    _setMarker(msg['Location']);
+
+    });
 
      _drawPolygon();
      

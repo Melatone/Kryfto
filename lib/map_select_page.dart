@@ -254,14 +254,10 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                                             lat_lng: lat_lng,
                                                           ))); 
                                               });
-                                              
-                                              /*Rose(
-                                                              points:
-                                                                  lat_lng)));
-                                                                  */
+                                             
 
                                   
-                                              Navigator.pop(context);
+                                             
 
                                             } else {
                                               Navigator.pop(context);

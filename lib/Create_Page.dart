@@ -23,11 +23,18 @@ class createpage extends StatefulWidget {
   List<LatLng> lat_lng;
   
   @override
-  State<createpage> createState() => _createpageState();
+  State<createpage> createState() => _createpageState(socket, user, lat_lng);
 }
 
 class _createpageState extends State<createpage> {
   List<PlayerModel> playersItems = [];
+   _createpageState(this.socket, this.user, this.lat_lng);
+  
+   IO.Socket socket;
+
+   User user;
+
+  List<LatLng> lat_lng;
 
   @override
   void initState() {
@@ -59,10 +66,10 @@ class _createpageState extends State<createpage> {
   }
 late int playTime;
 late int hideTime;
+
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -94,37 +101,7 @@ late int hideTime;
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(33.0),
                   ),
-                  child: Screen(
-                    socket: widget.socket,
-                    user: widget.user,
-                    lat_lng: widget.lat_lng,
-                  ),
-                ),
-                Spacer(flex: 3),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Screen extends StatelessWidget {
-  Screen(
-      {Key? key,
-      required this.socket,
-      required this.user,
-      required this.lat_lng})
-      : super(key: key);
-  final IO.Socket socket;
-  final User user;
-  List<LatLng> lat_lng;
- late int playTime;
-late int hideTime;
-  @override
-  Widget build(BuildContext context) {
-    return Center(
+                  child: Center(
       child: Column(
         children: [
           Spacer(flex: 1),
@@ -138,7 +115,11 @@ late int hideTime;
           Container(
             height: 70,
             child: ListWheelScrollView.useDelegate(
-              onSelectedItemChanged: (value) => playTime = value,
+              onSelectedItemChanged: (value) {
+                setState(() {
+                  playTime= value;
+                });
+              },
               itemExtent: 80,
               perspective: 0.001,
               diameterRatio: 0.2,
@@ -174,7 +155,12 @@ late int hideTime;
           Container(
             height: 70,
             child: ListWheelScrollView.useDelegate(
-              onSelectedItemChanged: (value) => hideTime = value,
+            
+              onSelectedItemChanged: (value) {
+                setState(() {
+                  hideTime= value;
+                });
+              },
               itemExtent: 80,
               perspective: 0.001,
               diameterRatio: 0.2,
@@ -227,9 +213,19 @@ late int hideTime;
           Spacer(),
         ],
       ),
+    ),
+                ),
+                Spacer(flex: 3),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 }
+
+
 
 class MyMinutes extends StatelessWidget {
   int mins;
