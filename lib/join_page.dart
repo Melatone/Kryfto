@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kryfto/Lobby.dart';
+import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'Model/User.dart';
@@ -53,7 +54,6 @@ class _JoinState extends State<Join> {
   void initState() {
     // TODO: implement initState
     List<PlayerModel> playersItems = [];
-
     widget.socket.on("join room", (msg) {
       final Map<String, dynamic> result = jsonDecode(jsonEncode(msg));
 
@@ -64,7 +64,7 @@ class _JoinState extends State<Join> {
             playersItems.add(PlayerModel(element['Username'], element['Role']));
           });
         });
-        print(result['Boundary'][0]);
+        print(result['Boundary']);
         this.setState(() {
           playersItems.add(PlayerModel(widget.user.username, false));
           Navigator.of(context).pop();
@@ -74,6 +74,8 @@ class _JoinState extends State<Join> {
                     socket: widget.socket,
                     playersItems: playersItems,
                     roomcode: roomController.text.toUpperCase(),
+                    points: result['Boundary'],
+                    player: PlayerModel(widget.user.username,false),
                   )));
         });
       }

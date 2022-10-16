@@ -8,6 +8,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Lobby.dart';
 import 'Model/User.dart';
 import 'Model/player.dart';
+import 'end_screen.dart';
 
 class createpage extends StatefulWidget {
   createpage(
@@ -39,11 +40,13 @@ class _createpageState extends State<createpage> {
           print(widget.lat_lng[0]);
           Navigator.of(context).pop();
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => Lobby(
+              builder: (context) => End(
                     user: widget.user,
                     socket: widget.socket,
                     playersItems: playersItems,
                     roomcode: data['Code'],
+                    player: PlayerModel(widget.user.username,false),
+                    points: widget.lat_lng,
                   )));
         });
       }

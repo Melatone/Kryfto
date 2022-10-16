@@ -7,7 +7,7 @@ import 'theme.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required socket});
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +85,7 @@ class _HomeState extends State<Home> {
                     TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
           ),
           onPressed: () {
+            
             Navigator.push(
                 context,
                 MaterialPageRoute(

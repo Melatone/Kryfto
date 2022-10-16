@@ -31,6 +31,7 @@ class _loginpageState extends State<loginpage> {
       if (data['Status'] == "Success") {
         this.setState(() {
           Navigator.of(context).pop();
+         
           Navigator.of(context).push(MaterialPageRoute(
               builder: ((context) => GamePage(
                     socket: widget.socket,

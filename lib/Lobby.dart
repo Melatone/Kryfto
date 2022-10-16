@@ -5,21 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/Model/User.dart';
 import 'package:kryfto/Model/player.dart';
+import 'package:kryfto/map_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+import 'Compass.dart';
+import 'countdown.dart';
 
 class Lobby extends StatefulWidget {
   final User user;
   final IO.Socket socket;
   final String roomcode;
+  final List<LatLng> points;
   List<PlayerModel> playersItems;
+  final PlayerModel player;
+
   Lobby(
       {Key? key,
       required this.user,
       required this.socket,
       required this.playersItems,
-      required this.roomcode})
+      required this.roomcode, 
+      required this.points,
+      required this.player})
       : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
@@ -48,6 +59,7 @@ class _LobbyState extends State<Lobby> {
           (element) {
             if (element.Username == result['Username']) {
               element.Seeker = result['Role'];
+              widget.player.Seeker = result['Role'];
             }
           },
         );
@@ -55,6 +67,18 @@ class _LobbyState extends State<Lobby> {
     });
 
     super.initState();
+  }
+
+    showOverlay(BuildContext context) async {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
+      return Center(child: Count(start: 10));
+    });
+    overlayState?.insert(overlayEntry);
+
+    await Future.delayed(Duration(seconds: Count(start: 10).start));
+
+    overlayEntry.remove();
   }
 
   @override
@@ -125,7 +149,7 @@ class _LobbyState extends State<Lobby> {
                                       }));
                                 },
 style: ElevatedButton.styleFrom(
-                               maximumSize: Size(200,100),
+                                maximumSize: Size(200,100),
                                minimumSize: Size(120,50),
                                 backgroundColor:  const Color(0xFF242222),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
@@ -155,7 +179,7 @@ style: ElevatedButton.styleFrom(
                               },
                               style: ElevatedButton.styleFrom(
                                maximumSize: Size(200,100),
-                               minimumSize: Size(120,60),
+                               minimumSize: Size(120,50),
                                 backgroundColor:  const Color(0xFF242222),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
                               ),
@@ -172,7 +196,29 @@ style: ElevatedButton.styleFrom(
                           Spacer(),
                         ],
                       ),
-                      Spacer(flex:8),
+                      Spacer(),
+                      ElevatedButton(
+                              onPressed: () {
+                                 Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(points: widget.points),
+                  ));
+                              },
+                              style: ElevatedButton.styleFrom(
+                               maximumSize: Size(200,100),
+                               minimumSize: Size(120,60),
+                                backgroundColor:  const Color(0xFF242222),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
+                              ),
+                              
+                                child: Text(
+                                  'Start Game',
+                                  style: GoogleFonts.righteous(
+                                    fontSize: 30,
+                                    color:Theme.of(context).backgroundColor,
+                                  ),
+                                ),
+                              ),
+                      Spacer(flex:5),
                   
                   ],
                 )

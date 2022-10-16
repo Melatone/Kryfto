@@ -99,17 +99,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
     _mapController.setMapStyle(mapStyle);
   }
 
-  showOverlay(BuildContext context) async {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
-      return Center(child: Count(start: 10));
-    });
-    overlayState?.insert(overlayEntry);
 
-    await Future.delayed(Duration(seconds: Count(start: 10).start));
-
-    overlayEntry.remove();
-  }
 
   void _setMarker(LatLng point) {
     final String markerIdVal = 'marker_$_markerIdCounter';
@@ -250,8 +240,8 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                           isDefaultAction: true,
                                           onPressed: () {
                                             if (lat_lng.length > 2) {
-                                              showOverlay(context);
-                                              Navigator.pop(context);
+                                              setState(() {
+                                                Navigator.of(context).pop;
                                               Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
@@ -260,7 +250,9 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                                                 widget.socket,
                                                             user: widget.user,
                                                             lat_lng: lat_lng,
-                                                          )));
+                                                          ))); 
+                                              });
+                                              
                                               /*Rose(
                                                               points:
                                                                   lat_lng)));

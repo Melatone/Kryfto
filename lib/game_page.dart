@@ -117,7 +117,7 @@ class _GameState extends State<Game> {
             ),
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => HomePage()));
+                  context, MaterialPageRoute(builder: (context) => Home()));
               ;
             },
           ),
