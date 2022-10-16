@@ -1,6 +1,8 @@
 
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +13,23 @@ import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
+import 'Model/User.dart';
 import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 
 class MapPage extends StatefulWidget {
   final List<LatLng> points;
-  const MapPage({super.key, required this.points});
+  final IO.Socket socket;
+  final User user;
+  final RoomInfo roomInfo;
+  const MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo});
 
   @override
   State<MapPage> createState() => _MapPageState(points);
@@ -37,7 +45,7 @@ class _MapPageState extends State<MapPage> {
     bool isMapCreated = false; 
    late GoogleMapController _mapController;
     int _polygonIdCounter =1;
-
+    int _markerCounter =1;
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
 
@@ -70,13 +78,25 @@ void getLocation(){
 Location location = Location();
 
 location.getLocation().then((location) {
-currentLocation = location;
-print(currentLocation);
+  currentLocation = location;
+
+  widget.socket.emit("player location",jsonEncode({
+    'Username:': widget.user.username,
+    'Code': widget.user.roomcode,
+    'Location': currentLocation,
+  }));
+
+  print(currentLocation);
 },
 );
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
+    widget.socket.emit("player location",jsonEncode({
+    'Username:': widget.user.username,
+    'Code': widget.user.roomcode,
+    'Location': newLoc,
+  }));
     setState(() {
       
     });
@@ -115,8 +135,8 @@ void _drawPolygon(){
 
 
  void _setMarker(LatLng point){
-   final String markerIdVal = 'Current lcoation';
-
+   final String markerIdVal = "Player $_markerCounter";
+_markerCounter++;
 
    setState(() {
      markers.add(
@@ -235,8 +255,10 @@ onMapCreated:(GoogleMapController controller){
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+  
   setState(() {
-    
+    widget.roomInfo.playerLocations.forEach(((element) => _setMarker(LatLng(element!.latitude!,element!.longitude!))));
+
      _drawPolygon();
      
   });

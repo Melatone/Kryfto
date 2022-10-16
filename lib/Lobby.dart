@@ -79,9 +79,9 @@ class _LobbyState extends State<Lobby> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(
                 points: widget.points, 
-              roomInfo: RoomInfo(widget.points, widget.roomcode, locations, widget.hideLimit, widget.timeLimit), 
+              
               socket: widget.socket, 
-              user: widget.user, ),
+              user: widget.user, roomInfo: RoomInfo(widget.points, widget.roomcode, locations, widget.hideLimit, widget.timeLimit),  ),
                   )); 
         }
       });
