@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/map_select_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'Lobby.dart';
@@ -20,6 +21,7 @@ class createpage extends StatefulWidget {
   final IO.Socket socket;
   final User user;
   List<LatLng> lat_lng;
+  
   @override
   State<createpage> createState() => _createpageState();
 }
@@ -40,21 +42,23 @@ class _createpageState extends State<createpage> {
           print(widget.lat_lng[0]);
           Navigator.of(context).pop();
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => End(
+              builder: (context) => Lobby(
                     user: widget.user,
                     socket: widget.socket,
                     playersItems: playersItems,
                     roomcode: data['Code'],
                     player: PlayerModel(widget.user.username,false),
-                    points: widget.lat_lng,
-                  )));
+                   hideLimit: hideTime, 
+                   points: widget.lat_lng, 
+                   timeLimit: playTime,)));
         });
       }
     });
 
     super.initState();
   }
-
+late int playTime;
+late int hideTime;
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -116,7 +120,8 @@ class Screen extends StatelessWidget {
   final IO.Socket socket;
   final User user;
   List<LatLng> lat_lng;
-
+ late int playTime;
+late int hideTime;
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -124,7 +129,7 @@ class Screen extends StatelessWidget {
         children: [
           Spacer(flex: 1),
           Text(
-            'Time Limit',
+            'Game Duration',
             style: GoogleFonts.righteous(
               fontSize: 30.0,
               color: Theme.of(context).primaryColor,
@@ -133,7 +138,7 @@ class Screen extends StatelessWidget {
           Container(
             height: 70,
             child: ListWheelScrollView.useDelegate(
-              onSelectedItemChanged: (value) => print(value),
+              onSelectedItemChanged: (value) => playTime = value,
               itemExtent: 80,
               perspective: 0.001,
               diameterRatio: 0.2,
@@ -157,7 +162,7 @@ class Screen extends StatelessWidget {
           ),
           Spacer(),
           Text(
-            'Number of Hiders',
+            'Hide Duration',
             style: GoogleFonts.righteous(
               fontSize: 30.0,
               color: Theme.of(context).primaryColor,
@@ -166,7 +171,7 @@ class Screen extends StatelessWidget {
           Container(
             height: 60,
             child: ListWheelScrollView.useDelegate(
-              onSelectedItemChanged: (value) => print(value),
+              onSelectedItemChanged: (value) => hideTime = value,
               itemExtent: 80,
               perspective: 0.001,
               diameterRatio: 0.2,
@@ -181,33 +186,14 @@ class Screen extends StatelessWidget {
               ),
             ),
           ),
-          Spacer(),
           Text(
-            'Number of Seekers',
+            'Minutes',
             style: GoogleFonts.righteous(
-              fontSize: 30.0,
+              fontSize: 20.0,
               color: Theme.of(context).primaryColor,
             ),
           ),
-          Container(
-            height: 60,
-            child: ListWheelScrollView.useDelegate(
-              onSelectedItemChanged: (value) => print(value),
-              itemExtent: 80,
-              perspective: 0.001,
-              diameterRatio: 0.2,
-              physics: const FixedExtentScrollPhysics(),
-              childDelegate: ListWheelChildBuilderDelegate(
-                childCount: 21,
-                builder: (context, index) {
-                  return Numseekers(
-                    numseekers: index,
-                  );
-                },
-              ),
-            ),
-          ),
-          Spacer(),
+          
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -229,6 +215,8 @@ class Screen extends StatelessWidget {
                     json.encode({
                       'Username': user.username,
                       'Boundary': lat_lng,
+                      'TimeLimit': playTime,
+                      'HideLimit': hideTime 
                     }));
               }
             },

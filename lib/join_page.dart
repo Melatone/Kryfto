@@ -75,7 +75,8 @@ class _JoinState extends State<Join> {
                     playersItems: playersItems,
                     roomcode: roomController.text.toUpperCase(),
                     points: result['Boundary'],
-                    player: PlayerModel(widget.user.username,false),
+                    player: PlayerModel(widget.user.username,false), hideLimit: result['HideLimit'], timeLimit: result['TimeLimit'],
+                    
                   )));
         });
       }

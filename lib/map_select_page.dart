@@ -241,8 +241,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                           isDefaultAction: true,
                                           onPressed: () {
                                             if (lat_lng.length > 2) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
                                               setState(() {
                                                 Navigator.of(context).pop;
                                               Navigator.of(context).push(
@@ -260,17 +259,10 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                                               points:
                                                                   lat_lng)));
                                                                   */
-=======
-=======
->>>>>>> Stashed changes
-                                              showOverlay(context);
+
+                                  
                                               Navigator.pop(context);
-                                             
-                                                      
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
                                             } else {
                                               Navigator.pop(context);
                                               showDialog(

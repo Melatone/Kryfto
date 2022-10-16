@@ -10,6 +10,7 @@ import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/Model/User.dart';
 import 'package:kryfto/Model/player.dart';
 import 'package:kryfto/map_page.dart';
+import 'package:location/location.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'Compass.dart';
@@ -22,6 +23,8 @@ class Lobby extends StatefulWidget {
   final List<LatLng> points;
   List<PlayerModel> playersItems;
   final PlayerModel player;
+  final int timeLimit;
+  final int hideLimit;
 
   Lobby(
       {Key? key,
@@ -30,13 +33,16 @@ class Lobby extends StatefulWidget {
       required this.playersItems,
       required this.roomcode, 
       required this.points,
-      required this.player})
+      required this.player,
+      required this.timeLimit,
+      required this.hideLimit,})
       : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
 }
 
 class _LobbyState extends State<Lobby> {
+  late List<LocationData> locations; 
   @override
   void initState() {
     super.initState();
@@ -63,6 +69,21 @@ class _LobbyState extends State<Lobby> {
             }
           },
         );
+      });
+    });
+    widget.socket.on("create room", (msg){
+      final result = json.decode(msg);
+      this.setState(() {
+        if(msg['Status'] =="Success"){
+          Navigator.pop(context);
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(
+                points: widget.points, 
+              roomInfo: RoomInfo(widget.points, widget.roomcode, locations, widget.hideLimit, widget.timeLimit), 
+              socket: widget.socket, 
+              user: widget.user, ),
+                  )); 
+        }
       });
     });
 
@@ -199,9 +220,7 @@ style: ElevatedButton.styleFrom(
                       Spacer(),
                       ElevatedButton(
                               onPressed: () {
-                                 Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(points: widget.points),
-                  ));
+                                 
                               },
                               style: ElevatedButton.styleFrom(
                                maximumSize: Size(200,100),
