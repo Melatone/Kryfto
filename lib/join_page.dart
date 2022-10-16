@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/Lobby.dart';
 import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/login_page.dart';
@@ -55,16 +56,15 @@ class _JoinState extends State<Join> {
     // TODO: implement initState
     List<PlayerModel> playersItems = [];
     widget.socket.on("join room", (msg) {
-      final Map<String, dynamic> result = jsonDecode(jsonEncode(msg));
-
-      if (result['Status'] == 'Success') {
-        result['Players'].forEach((element) {
+      msg = jsonDecode(msg);
+      if (msg['Status'] == 'Success') {
+        msg['Players'].forEach((element) {
           print(element['Role'].runtimeType);
           this.setState(() {
             playersItems.add(PlayerModel(element['Username'], element['Role']));
           });
         });
-        print(result['Boundary']);
+       
         this.setState(() {
           playersItems.add(PlayerModel(widget.user.username, false));
           Navigator.of(context).pop();
@@ -74,8 +74,8 @@ class _JoinState extends State<Join> {
                     socket: widget.socket,
                     playersItems: playersItems,
                     roomcode: roomController.text.toUpperCase(),
-                    points: result['Boundary'],
-                    player: PlayerModel(widget.user.username,false), hideLimit: result['HideLimit'], timeLimit: result['TimeLimit'],
+                    points: msg["Boundary"],
+                    player: PlayerModel(widget.user.username,false), hideLimit: msg['HideLimit'], timeLimit: msg['TimeLimit'],
                     
                   )));
         });
