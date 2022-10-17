@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,32 +35,34 @@ class _RoseState extends State<Rose> {
  List<LatLng> points;
   _RoseState(this.points);
   double? heading;
-
-  
-  
 static const initCameraPosition = CameraPosition(
     target: LatLng(-36.853940, 174.764620),
-    zoom:16);
+    zoom:16, );
     bool isMapCreated = false; 
    late GoogleMapController _mapController;
     int _polygonIdCounter =1;
-
+    int _markerCounter =1;
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
-
+  double angle =0;
  LocationData? currentLocation;
-  
+  LatLng movingPoint = LatLng(-36.852994, 174.765477);
+ List<LatLng> hiders = <LatLng>[];
+ LatLng point = LatLng (-36.850361, 174.761994);
+ late mp.LatLng closest; 
+ late LatLng nearest;
+ late int distance;
+
+
 
 @override
 void initState(){
   getLocation();
-  FlutterCompass.events!.listen((event) {
-    setState(() {
-      heading = event.heading;
-    });
-    
-  });
   
+  hiders.add(point);
+  hiders.add(movingPoint);
+  
+ 
   super.initState();
 }
 Duration time = Duration(minutes: 30);
@@ -69,9 +72,17 @@ Duration? current;
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
+    Timer compass = new Timer.periodic(Duration(seconds:5), (_) => calcCompass());
+    Timer move = new Timer.periodic(Duration(seconds:20), (_){
+      setState(() {
+        hiders.remove(movingPoint);
+        movingPoint = LatLng(-36.850413, 174.767380);
+        hiders.add(movingPoint);
+      });
+    });
     current = time;
   }
-  void countDown(){
+  void countDown(){ 
     final second = 1;
     setState(() {
 
@@ -79,6 +90,81 @@ Duration? current;
       time = Duration(seconds: seconds);
     });
   }
+
+  
+ void _setMarker(LatLng point){
+   final String markerIdVal = "Player $_markerCounter";
+_markerCounter++;
+
+   setState(() {
+     markers.remove(markers.last);
+     markers.add(
+       Marker(markerId: MarkerId(markerIdVal), 
+       position: point,
+       infoWindow: InfoWindow(title:markerIdVal),
+      draggable: false,
+   
+      )
+      
+     );
+     
+   });
+      
+ }
+void calcCompass(){
+
+List<mp.LatLng> hidden = <mp.LatLng>[];
+
+
+for(int i=0; i < hiders.length; i++){
+  hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
+print(hidden);
+}
+
+for(int i =1; i < hiders.length; i ++){
+if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) < mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))){
+  closest = hidden[i];
+  distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+  print(closest);
+
+    nearest = LatLng(hidden[i].latitude,hidden[i].longitude);
+    setState(() {
+      angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
+      
+     
+  _setMarker(nearest);
+});
+}
+else if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) > mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))) {
+  closest = hidden[0];
+  distance = mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+  print(closest);
+  nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
+  setState(() {
+    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
+      
+  _setMarker(nearest);
+});
+}
+else{
+  closest = closest;
+  nearest = nearest;
+}
+
+}
+
+ 
+  print(angle);
+ FlutterCompass.events!.listen((event) {
+    setState(() {
+      heading = event.heading! - angle;
+    });
+    
+  });
+}
+
+
+
   void _drawPolygon(){
   
   
@@ -93,11 +179,17 @@ polygons.add(Polygon(
   fillColor: Theme.of(context).primaryColorLight.withAlpha(50)));
   
  }
+ void initCompass(){
+   mp.LatLng closest = mp.SphericalUtil.computeOffset(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), 5.5, 0); 
+   nearest = LatLng(closest.latitude,closest.longitude);
+  distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+
+ }
 void getLocation(){
 Location location = Location();
-
 location.getLocation().then((location) {
 currentLocation = location;
+ initCompass();
 print(currentLocation);
 },
 );
@@ -160,15 +252,13 @@ if(!inside){
     showOverlay(context);
   });
 }
-
-  
 }
 
 
-  
+
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
      extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -211,22 +301,31 @@ onMapCreated:(GoogleMapController controller){
                       CameraPosition(
                           target: LatLng(currentLocation!.latitude!,
                               currentLocation!.longitude!),
-                          zoom: 16)));
+                          zoom: 15)));
   markers.add(Marker(markerId:const MarkerId("Current Location"),
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+
+markers.add(Marker(markerId:const MarkerId("Current Location"),
+position: LatLng(nearest!.latitude!,nearest!.longitude!),
+infoWindow: InfoWindow(title: 'Compass Init'),
+icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
   setState(() {
-    
+    for(int i =0; i < hiders.length; i++){
+   
+    }
      _drawPolygon();
      
   });
   
+  
 }
-      ),),
+      ),
+    ),
 
         Spacer(flex: 1),
-        Text("Nearest Player: ",
+        Text("Nearest Player: $distance m",
       style:
      GoogleFonts.righteous(
     textStyle: TextStyle(
@@ -236,7 +335,7 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
           alignment: Alignment.center,
           children:<Widget>[ Image.asset("images/Cross.png", width: 300,height: 300),
        
-        Transform.rotate(angle: ((heading ?? 0) * (pi / 180) * -1),
+        Transform.rotate(angle: ((heading ?? 0 ) * (pi / 180) * -1),
         child:  Image.asset("images/Arrow.png", width: 85,height: 85)),
         ]
                 
@@ -244,10 +343,9 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
         Spacer(flex: 3),
       
        
-      ],))
-      ,
-       
+      ],)
+      ),
     );
   }
 }
-
+  

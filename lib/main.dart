@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/Compass.dart';
 import 'package:kryfto/countdown.dart';
 import 'package:kryfto/elimination.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Kryfto',
       debugShowCheckedModeBanner: false,
       theme: theme(),
       home: MyHomePage(title: 'Kryfto',),
@@ -63,7 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: Home(),
+      body: Rose(points: [LatLng(-36.850361458977, 174.7619941458106), LatLng(-36.85041297053933, 174.7673800215125), LatLng(-36.8558445626692, 174.76750172674656),LatLng(-36.8563709070557, 174.76259496062994)
+
+
+],),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
