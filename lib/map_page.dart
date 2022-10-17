@@ -30,7 +30,7 @@ class MapPage extends StatefulWidget {
   final User user;
   final RoomInfo roomInfo;
   const MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo});
-
+ 
   @override
   State<MapPage> createState() => _MapPageState(points);
 }
@@ -152,6 +152,8 @@ _markerCounter++;
    });
       
  }
+
+
 showOverlay(BuildContext context) async {
   OverlayState? overlayState =Overlay.of(context);
 OverlayEntry overlayEntry = OverlayEntry(builder: (context){
@@ -258,8 +260,11 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
   
   setState(() {
     widget.socket.on("player location", (msg){
-    msg = jsonDecode(msg);
-    _setMarker(msg['Location']);
+      
+    
+    Map<String, dynamic> map = json.decode(json.encode(msg));
+    List<dynamic> data = map["Location"];
+    _setMarker(LatLng(data[0],data[1]));
 
     });
 

@@ -64,10 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: Rose(points: [LatLng(-36.850361458977, 174.7619941458106), LatLng(-36.85041297053933, 174.7673800215125), LatLng(-36.8558445626692, 174.76750172674656),LatLng(-36.8563709070557, 174.76259496062994)
+      body: Home()
+// Rose(points: [LatLng(-36.850361458977, 174.7619941458106), LatLng(-36.85041297053933, 174.7673800215125), LatLng(-36.8558445626692, 174.76750172674656),LatLng(-36.8563709070557, 174.76259496062994)
 
-
-],),
+// ],),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
