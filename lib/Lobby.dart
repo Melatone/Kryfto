@@ -26,23 +26,22 @@ class Lobby extends StatefulWidget {
   final int timeLimit;
   final int hideLimit;
 
-  Lobby(
-      {Key? key,
-      required this.user,
-      required this.socket,
-      required this.playersItems,
-      required this.roomcode, 
-      required this.points,
-      required this.player,
-      required this.timeLimit,
-      required this.hideLimit,})
-      : super(key: key);
+  Lobby({
+    Key? key,
+    required this.user,
+    required this.socket,
+    required this.playersItems,
+    required this.roomcode,
+    required this.points,
+    required this.player,
+    required this.timeLimit,
+    required this.hideLimit,
+  }) : super(key: key);
   @override
   State<Lobby> createState() => _LobbyState();
 }
 
 class _LobbyState extends State<Lobby> {
-
   @override
   void initState() {
     super.initState();
@@ -71,21 +70,24 @@ class _LobbyState extends State<Lobby> {
         );
       });
     });
-   
 
-    widget.socket.on("start game", (msg){
+    widget.socket.on("start game", (msg) {
       final Map<String, dynamic> result = jsonDecode(jsonEncode(msg));
       print(result['status']);
       this.setState(() {
-        if(msg['status'] =="Success"){
+        if (msg['status'] == "Success") {
           Navigator.pop(context);
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>  widget.player.Seeker ? Rose(points: widget.points) : MapPage(
-                points: widget.points, 
-              
-              socket: widget.socket, 
-              user: widget.user, roomInfo: RoomInfo(widget.points, widget.roomcode, widget.hideLimit, widget.timeLimit),  ),
-                  )); 
+            builder: (context) => widget.player.Seeker
+                ? Rose(points: widget.points)
+                : MapPage(
+                    points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomcode,
+                        widget.hideLimit, widget.timeLimit),
+                  ),
+          ));
         }
       });
     });
@@ -93,10 +95,7 @@ class _LobbyState extends State<Lobby> {
     super.initState();
   }
 
-
-  
-
-    showOverlay(BuildContext context) async {
+  showOverlay(BuildContext context) async {
     OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
       return Center(child: Count(start: 10));
@@ -110,151 +109,133 @@ class _LobbyState extends State<Lobby> {
 
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-       centerTitle: true, title: Text(widget.roomcode,
-            style: GoogleFonts.righteous(
-                textStyle: TextStyle(
-                    fontSize: 40, color: Theme.of(context).primaryColor)))),
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          centerTitle: true,
+          title: Text(widget.roomcode,
+              style: GoogleFonts.righteous(
+                  textStyle: TextStyle(
+                      fontSize: 40, color: Theme.of(context).primaryColor)))),
       backgroundColor: Theme.of(context).primaryColor,
       body: Center(
-        child: Column(
-                  children: <Widget>[
-                    
-                    
-                    Spacer(),
-                      Text(
-                        'Players',
-                        style: GoogleFonts.righteous(
-                          fontSize: 30,
-                          color: Colors.white,
-                        ),
-                      ),
-                    Spacer(flex:1),
-                    Container(
-                        alignment: Alignment.center,
-                        width: 350,
-                        height: 400,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ListView.builder(
-                            itemCount: widget.playersItems.length,
-                            itemBuilder: (context, index) {
-                              var currentPlayer = widget.playersItems[index];
-                              return Players(
-                                Username: currentPlayer.Username,
-                                seeker: currentPlayer.Seeker,
-                                user: widget.user,
-                              );
-                            })),
-                    Spacer(),
-                       Text(
-                        'Choose Your Role',
-                        style: GoogleFonts.righteous(
-                          fontSize: 30,
-                          color: Theme.of(context).backgroundColor,
-                        ),
-                      ),
-                    
-                    Spacer(),
-                    Row(
-                        children: <Widget>[
-                          
-                          Spacer(),  
-                          ElevatedButton(
-                            
-                                onPressed: () {
-                                  widget.socket.emit(
-                                      "change role",
-                                      json.encode({
-                                        'Code': widget.roomcode,
-                                        'Username': widget.user.username,
-                                        'Role': false,
-                                      }));
-                                },
-style: ElevatedButton.styleFrom(
-                                maximumSize: Size(200,100),
-                               minimumSize: Size(120,50),
-                                backgroundColor:  const Color(0xFF242222),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                              ),
-                              
-                          
-                                
-                                  child: Text(
-                                    'Hider',
-                                    style: GoogleFonts.righteous(
-                                      fontSize: 30,
-                                      color: Theme.of(context).backgroundColor,
-                                    ),
-                                  ),
-                                ),
-                        
-                        Spacer(),
-                            ElevatedButton(
-                              onPressed: () {
-                                widget.socket.emit(
-                                    "change role",
-                                    json.encode({
-                                      'Code': widget.roomcode,
-                                      'Username': widget.user.username,
-                                      'Role': true,
-                                    }));
-                              },
-                              style: ElevatedButton.styleFrom(
-                               maximumSize: Size(200,100),
-                               minimumSize: Size(120,50),
-                                backgroundColor:  const Color(0xFF242222),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                              ),
-                              
-                                child: Text(
-                                  'Seeker',
-                                  style: GoogleFonts.righteous(
-                                    fontSize: 30,
-                                    color:Theme.of(context).backgroundColor,
-                                  ),
-                                ),
-                              ),
-                            
-                          Spacer(),
-                        ],
-                      ),
-                      Spacer(),
-                      ElevatedButton(
-                              onPressed: () {
-                                 widget.socket.emit("start game",jsonEncode({
-                                   'Code':widget.roomcode
-                                 }));
-                              },
-                              style: ElevatedButton.styleFrom(
-                               maximumSize: Size(200,100),
-                               minimumSize: Size(120,60),
-                                backgroundColor:  const Color(0xFF242222),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                              ),
-                              
-                                child: Text(
-                                  'Start Game',
-                                  style: GoogleFonts.righteous(
-                                    fontSize: 30,
-                                    color:Theme.of(context).backgroundColor,
-                                  ),
-                                ),
-                              ),
-                      Spacer(flex:5),
-                  
-                  ],
-                )
+          child: Column(
+        children: <Widget>[
+          Spacer(),
+          Text(
+            'Players',
+            style: GoogleFonts.righteous(
+              fontSize: 30,
+              color: Colors.white,
+            ),
+          ),
+          Spacer(flex: 1),
+          Container(
+              alignment: Alignment.center,
+              width: 350,
+              height: 400,
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ListView.builder(
+                  itemCount: widget.playersItems.length,
+                  itemBuilder: (context, index) {
+                    var currentPlayer = widget.playersItems[index];
+                    return Players(
+                      Username: currentPlayer.Username,
+                      seeker: currentPlayer.Seeker,
+                      user: widget.user,
+                    );
+                  })),
+          Spacer(),
+          Text(
+            'Choose Your Role',
+            style: GoogleFonts.righteous(
+              fontSize: 30,
+              color: Theme.of(context).backgroundColor,
+            ),
+          ),
+          Spacer(),
+          Row(
+            children: <Widget>[
+              Spacer(),
+              ElevatedButton(
+                onPressed: () {
+                  widget.socket.emit(
+                      "change role",
+                      json.encode({
+                        'Code': widget.roomcode,
+                        'Username': widget.user.username,
+                        'Role': false,
+                      }));
+                },
+                style: ElevatedButton.styleFrom(
+                    maximumSize: Size(200, 100),
+                    minimumSize: Size(120, 50),
+                    backgroundColor: const Color(0xFF242222),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25))),
+                child: Text(
+                  'Hider',
+                  style: GoogleFonts.righteous(
+                    fontSize: 30,
+                    color: Theme.of(context).backgroundColor,
+                  ),
                 ),
-          
-        );
-        
-      
-    
+              ),
+              Spacer(),
+              ElevatedButton(
+                onPressed: () {
+                  widget.socket.emit(
+                      "change role",
+                      json.encode({
+                        'Code': widget.roomcode,
+                        'Username': widget.user.username,
+                        'Role': true,
+                      }));
+                },
+                style: ElevatedButton.styleFrom(
+                    maximumSize: Size(200, 100),
+                    minimumSize: Size(120, 50),
+                    backgroundColor: const Color(0xFF242222),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25))),
+                child: Text(
+                  'Seeker',
+                  style: GoogleFonts.righteous(
+                    fontSize: 30,
+                    color: Theme.of(context).backgroundColor,
+                  ),
+                ),
+              ),
+              Spacer(),
+            ],
+          ),
+          Spacer(),
+          ElevatedButton(
+            onPressed: () {
+              widget.socket
+                  .emit("start game", jsonEncode({'Code': widget.roomcode}));
+            },
+            style: ElevatedButton.styleFrom(
+                maximumSize: Size(200, 100),
+                minimumSize: Size(120, 60),
+                backgroundColor: const Color(0xFF242222),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25))),
+            child: Text(
+              'Start Game',
+              style: GoogleFonts.righteous(
+                fontSize: 30,
+                color: Theme.of(context).backgroundColor,
+              ),
+            ),
+          ),
+          Spacer(flex: 5),
+        ],
+      )),
+    );
   }
 }
 
@@ -280,33 +261,30 @@ class Players extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(29.0),
               color: Theme.of(context).backgroundColor,
-             
             ),
             child: Row(
-           mainAxisAlignment: MainAxisAlignment.center,
-           
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Spacer(),
-                 Text(
-                    Username,
-                    style: GoogleFonts.righteous(
-                      fontSize: 20,
-                      color: Username == user.username
-                          ? Theme.of(context).primaryColor
-                          : Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    textAlign: TextAlign.left,
+                Text(
+                  Username,
+                  style: GoogleFonts.righteous(
+                    fontSize: 20,
+                    color: Username == user.username
+                        ? Theme.of(context).primaryColor
+                        : Color.fromARGB(255, 0, 0, 0),
                   ),
-                Spacer(flex:4),
-              
-                  Text(
-                    seeker ? "Seeker" : "Hider",
-                    style: GoogleFonts.righteous(
-                      fontSize: height * 0.03,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    textAlign: TextAlign.right,
+                  textAlign: TextAlign.left,
+                ),
+                Spacer(flex: 4),
+                Text(
+                  seeker ? "Seeker" : "Hider",
+                  style: GoogleFonts.righteous(
+                    fontSize: height * 0.03,
+                    color: Color.fromARGB(255, 0, 0, 0),
                   ),
+                  textAlign: TextAlign.right,
+                ),
                 Spacer(),
               ],
             )));

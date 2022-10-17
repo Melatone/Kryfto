@@ -56,7 +56,11 @@ class _JoinState extends State<Join> {
     // TODO: implement initState
     List<PlayerModel> playersItems = [];
     widget.socket.on("join room", (msg) {
-      msg = jsonDecode(msg);
+      Map<String, dynamic> map = json.decode(json.encode(msg));
+      List<dynamic> data = map["Boundary"];
+      List<LatLng> lat_lng = data.map((e) => LatLng(e[0], e[1])).toList();
+      print(lat_lng);
+      print(lat_lng[0]);
       if (msg['Status'] == 'Success') {
         msg['Players'].forEach((element) {
           print(element['Role'].runtimeType);
@@ -64,7 +68,7 @@ class _JoinState extends State<Join> {
             playersItems.add(PlayerModel(element['Username'], element['Role']));
           });
         });
-       
+
         this.setState(() {
           playersItems.add(PlayerModel(widget.user.username, false));
           Navigator.of(context).pop();
@@ -74,9 +78,10 @@ class _JoinState extends State<Join> {
                     socket: widget.socket,
                     playersItems: playersItems,
                     roomcode: roomController.text.toUpperCase(),
-                    points: msg["Boundary"],
-                    player: PlayerModel(widget.user.username,false), hideLimit: msg['HideLimit'], timeLimit: msg['TimeLimit'],
-                    
+                    points: lat_lng,
+                    player: PlayerModel(widget.user.username, false),
+                    timeLimit: msg['TimeLimit'],
+                    hideLimit: msg['HideLimit'],
                   )));
         });
       }
