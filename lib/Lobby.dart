@@ -25,7 +25,7 @@ class Lobby extends StatefulWidget {
   final PlayerModel player;
   final int timeLimit;
   final int hideLimit;
-
+  
   Lobby({
     Key? key,
     required this.user,
@@ -42,6 +42,9 @@ class Lobby extends StatefulWidget {
 }
 
 class _LobbyState extends State<Lobby> {
+
+bool countDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -76,18 +79,8 @@ class _LobbyState extends State<Lobby> {
       print(result['status']);
       this.setState(() {
         if (msg['status'] == "Success") {
-          Navigator.pop(context);
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => widget.player.Seeker
-                ? Rose(points: widget.points)
-                : MapPage(
-                    points: widget.points,
-                    socket: widget.socket,
-                    user: widget.user,
-                    roomInfo: RoomInfo(widget.points, widget.roomcode,
-                        widget.hideLimit, widget.timeLimit),
-                  ),
-          ));
+        showOverlay(context);
+          
         }
       });
     });
@@ -96,15 +89,45 @@ class _LobbyState extends State<Lobby> {
   }
 
   showOverlay(BuildContext context) async {
+    int count=widget.hideLimit;
+   
+
+
+
+    
     OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
-      return Center(child: Count(start: 10));
+      return Center(child: Count(start: count));
     });
     overlayState?.insert(overlayEntry);
+    
+    await Future.delayed(Duration(seconds: count));
+  setState(() {
+        overlayEntry.remove();
 
-    await Future.delayed(Duration(seconds: Count(start: 10).start));
+         Navigator.pop(context);
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => widget.player.Seeker
+                ? Rose(points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomcode,
+                        widget.hideLimit, widget.timeLimit,
+                        ),
+                        timeLimit: widget.timeLimit,
+                  )
+                : MapPage(points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomcode,
+                        widget.hideLimit, widget.timeLimit,
+                        ),
+                        timeLimit: widget.timeLimit,
+                  ),
+          ));
+  });
+  
 
-    overlayEntry.remove();
   }
 
   @override
@@ -217,6 +240,7 @@ class _LobbyState extends State<Lobby> {
             onPressed: () {
               widget.socket
                   .emit("start game", jsonEncode({'Code': widget.roomcode}));
+                
             },
             style: ElevatedButton.styleFrom(
                 maximumSize: Size(200, 100),

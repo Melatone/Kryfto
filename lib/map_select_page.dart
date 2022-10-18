@@ -205,12 +205,15 @@ class _MapPageSelectState extends State<MapSelectPage> {
                 child: FittedBox(
                   child: FloatingActionButton(
                     onPressed: () {
+                      if(markers.length>1&&polygons.length>0){
                       setState(() {
                         markers.remove(markers.last);
                         polygons.remove(polygons.last);
                         lat_lng.remove(lat_lng.last);
                       });
+                      }
                     },
+
                     child: const Icon(Icons.arrow_circle_left),
                     backgroundColor: ui.Color.fromARGB(199, 234, 42, 61),
                     elevation: 0,

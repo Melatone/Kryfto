@@ -9,6 +9,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'package:location/location.dart';
+import 'Model/RoomInfo.dart';
+import 'Model/User.dart';
+import 'Model/player.dart';
 import 'game_page.dart';
 import 'map_select_page.dart';
 import 'home_page.dart';
@@ -18,14 +21,20 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
-
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 
 
 class Rose extends StatefulWidget {
  
-  const Rose({Key? key, required this.points}) : super(key: key);
-   final List<LatLng> points;
+  
+  final List<LatLng> points;
+  final IO.Socket socket;
+  final User user;
+  final RoomInfo roomInfo;
+
+  final int timeLimit;
+   Rose({Key? key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.timeLimit}) : super(key: key);
   @override
   State<Rose> createState() => _RoseState(points);
 }
@@ -46,48 +55,42 @@ static const initCameraPosition = CameraPosition(
   Set<Polygon> polygons = {};
   double angle =0;
  LocationData? currentLocation;
-  LatLng movingPoint = LatLng(-36.852994, 174.765477);
+
  List<LatLng> hiders = <LatLng>[];
- LatLng point = LatLng (-36.850361, 174.761994);
+
  late mp.LatLng closest; 
  late LatLng nearest;
- late int distance;
+ int distance = 0 ;
 
 
 
 @override
 void initState(){
   getLocation();
-  
-  hiders.add(point);
-  hiders.add(movingPoint);
-  
+
  
   super.initState();
 }
-Duration time = Duration(minutes: 30);
+
 late Timer timer;
-Duration? current;
+Duration? current = Duration(minutes:30);
 
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
-    Timer compass = new Timer.periodic(Duration(seconds:5), (_) => calcCompass());
-    Timer move = new Timer.periodic(Duration(seconds:20), (_){
-      setState(() {
-        hiders.remove(movingPoint);
-        movingPoint = LatLng(-36.850413, 174.767380);
-        hiders.add(movingPoint);
-      });
-    });
-    current = time;
+
+
+     
+      
+    
+    current = Duration(minutes:widget.timeLimit);
   }
   void countDown(){ 
     final second = 1;
     setState(() {
 
-      final seconds = time.inSeconds - second;
-      time = Duration(seconds: seconds);
+      final seconds = current!.inSeconds - second;
+      current = Duration(seconds: seconds);
     });
   }
 
@@ -112,36 +115,33 @@ _markerCounter++;
       
  }
 void calcCompass(){
-
+  
 List<mp.LatLng> hidden = <mp.LatLng>[];
-
-
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
 print(hidden);
 }
-
 for(int i =1; i < hiders.length; i ++){
-if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) < mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))){
+if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) < 
+mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))){
   closest = hidden[i];
   print(closest);
-
     nearest = LatLng(hidden[i].latitude,hidden[i].longitude);
     setState(() {
+      markers.remove("Compass");
   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
-
-      angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
-      
-     
+      angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();  
   _setMarker(nearest);
+  
 });
 }
-else if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) > mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))) {
+else if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) > 
+mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))) {
   closest = hidden[0];
-  
   print(closest);
   nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
   setState(() {
+    markers.remove("Compass");
     distance = mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
       
@@ -152,16 +152,12 @@ else{
   closest = closest;
   nearest = nearest;
 }
-
 }
-
- 
   print(angle);
  FlutterCompass.events!.listen((event) {
     setState(() {
       heading = event.heading! - angle;
     });
-    
   });
 }
 
@@ -187,6 +183,19 @@ polygons.add(Polygon(
   distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
 
  }
+
+void initPlayer(){
+  widget.socket.on("player location", (msg){
+      msg= jsonDecode(msg);
+    
+    print(msg['Location'][0]);
+    print(msg['Location'][1]);
+    if(LatLng(msg['Location'][0],msg['Location'][1])!=currentLocation!){
+    hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
+    }
+});
+}
+
 void getLocation(){
 Location location = Location();
 location.getLocation().then((location) {
@@ -198,8 +207,14 @@ print(currentLocation);
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
+    calcCompass();
     setState(() {
-      
+      markers.remove("Current Location");
+      markers.add(Marker(markerId:const MarkerId("Current Location"),
+position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
+infoWindow: InfoWindow(title: 'Current Location'),
+icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+
     });
   });
   
@@ -268,7 +283,7 @@ if(!inside){
     
       centerTitle: true,
       backgroundColor: Color(0xbbf2f2f2),
-      title: Text(time.toString().substring(0,time.toString().length-7),
+      title: Text(current.toString().substring(0,current.toString().length-7),
       style:
      GoogleFonts.righteous(
     textStyle: TextStyle(
@@ -283,13 +298,14 @@ if(!inside){
          height: 420,
          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
          child: 
-         currentLocation ==null ? 
+         currentLocation == null ? 
       Center(child: Text("Loading...",style: GoogleFonts.righteous(textStyle: TextStyle(fontSize: 25, color: Theme.of(context).primaryColor) )))
       :GoogleMap(
         markers: markers,
         polygons: polygons,
         zoomControlsEnabled: true,
         myLocationButtonEnabled: false,
+        
         
 initialCameraPosition: initCameraPosition,
 
@@ -304,19 +320,14 @@ onMapCreated:(GoogleMapController controller){
                           target: LatLng(currentLocation!.latitude!,
                               currentLocation!.longitude!),
                           zoom: 15)));
-  markers.add(Marker(markerId:const MarkerId("Current Location"),
-position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
-infoWindow: InfoWindow(title: 'Current Location'),
-icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+  
 
-markers.add(Marker(markerId:const MarkerId("Current Location"),
+markers.add(Marker(markerId:const MarkerId("Compass"),
 position: LatLng(nearest!.latitude!,nearest!.longitude!),
 infoWindow: InfoWindow(title: 'Compass Init'),
-icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) ));
   setState(() {
-    for(int i =0; i < hiders.length; i++){
-   
-    }
+    
      _drawPolygon();
      
   });

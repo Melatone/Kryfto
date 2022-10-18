@@ -17,6 +17,7 @@ import 'package:kryfto/Model/RoomInfo.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
 import 'Model/User.dart';
+import 'Model/player.dart';
 import 'countdown.dart';
 import 'map_page.dart';
 import 'theme.dart';
@@ -29,7 +30,9 @@ class MapPage extends StatefulWidget {
   final IO.Socket socket;
   final User user;
   final RoomInfo roomInfo;
-  const MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo});
+
+    final int timeLimit;
+  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.timeLimit});
  
   @override
   State<MapPage> createState() => _MapPageState(points);
@@ -53,22 +56,22 @@ class _MapPageState extends State<MapPage> {
   
 
 
-Duration time = Duration(minutes: 30);
-late Timer timer;
-Duration? current;
 
+late Timer timer;
+Duration current = Duration(minutes: 30);
 
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
-    current = time;
+   
+    current = Duration(minutes:widget.timeLimit);
   }
   void countDown(){
     final second = 1;
     setState(() {
 
-      final seconds = time.inSeconds - second;
-      time = Duration(seconds: seconds);
+      final seconds = current!.inSeconds - second;
+      current = Duration(seconds: seconds);
     });
   }
 
@@ -77,18 +80,8 @@ Duration? current;
 void getLocation(){
 Location location = Location();
 
-location.getLocation().then((location) {
-  currentLocation = location;
 
-  widget.socket.emit("player location",jsonEncode({
-    'Username:': widget.user.username,
-    'Code': widget.user.roomcode,
-    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
-  }));
 
-  print(currentLocation);
-},
-);
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
@@ -98,7 +91,12 @@ location.onLocationChanged.listen(
     'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
     setState(() {
-      
+      markers.remove("Current Location");
+         markers.add(Marker(markerId:MarkerId("Current Location"),
+position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
+infoWindow: InfoWindow(title: 'Current Location'),
+icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+drawPoints();
     });
   });
   
@@ -135,10 +133,10 @@ void _drawPolygon(){
 
 
  void _setMarker(LatLng point){
-   final String markerIdVal = "Player $_markerCounter";
-_markerCounter++;
+ String markerIdVal = "Player ";
 
    setState(() {
+     
      markers.add(
        Marker(markerId: MarkerId(markerIdVal), 
        position: point,
@@ -148,8 +146,8 @@ _markerCounter++;
       )
       
      );
-     
-   });
+     });
+   
       
  }
 
@@ -187,12 +185,29 @@ if(!inside){
   
 }
 
+void drawPoints(){
+  
+  setState(() {
+    widget.socket.on("player location", (msg){
+      msg= jsonDecode(msg);
+    
+    print(msg['Location'][0]);
+    print(msg['Location'][1]);
+    if(LatLng(msg['Location'][0],msg['Location'][1])!=markers.where((element){
+      element.infoWindow == InfoWindow(title:'Current Location');
+    }).){
+    _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
+    }
+    });
 
+   
+      });
+}
 
 
   @override
   void dispose(){
-    _mapController.dispose();
+    _madispose();
     super.dispose();
   }
 
@@ -225,7 +240,7 @@ if(isMapCreated){
     return  Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(centerTitle: true,
-      title: Text(time.toString().substring(0,time.toString().length-7),
+      title: Text(current.toString().substring(0,current.toString().length-7),
       style: GoogleFonts.righteous(textStyle:TextStyle(color: Theme.of(context).backgroundColor,
       fontSize: 35,
       ))),
@@ -237,7 +252,7 @@ if(isMapCreated){
       :GoogleMap(
         markers: markers,
         polygons: polygons,
-        zoomControlsEnabled: true,
+        zoomControlsEnabled: false,
         myLocationButtonEnabled: false,
         
 initialCameraPosition: initCameraPosition,
@@ -253,20 +268,10 @@ onMapCreated:(GoogleMapController controller){
                           target: LatLng(currentLocation!.latitude!,
                               currentLocation!.longitude!),
                           zoom: 16)));
-  markers.add(Marker(markerId:const MarkerId("Current Location"),
-position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
-infoWindow: InfoWindow(title: 'Current Location'),
-icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
+ 
   
   setState(() {
-    widget.socket.on("player location", (msg){
-      
-    
-    Map<String, dynamic> map = json.decode(json.encode(msg));
-    List<dynamic> data = map["Location"];
-    _setMarker(LatLng(data[0],data[1]));
-
-    });
+ 
 
      _drawPolygon();
      

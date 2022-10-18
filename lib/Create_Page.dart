@@ -125,7 +125,7 @@ late int hideTime;
               diameterRatio: 0.2,
               physics: const FixedExtentScrollPhysics(),
               childDelegate: ListWheelChildBuilderDelegate(
-                childCount: 151,
+                childCount: 90,
                 builder: (context, index) {
                   return MyMinutes(
                     mins: index,
@@ -166,7 +166,7 @@ late int hideTime;
               diameterRatio: 0.2,
               physics: const FixedExtentScrollPhysics(),
               childDelegate: ListWheelChildBuilderDelegate(
-                childCount: 151,
+                childCount: 180,
                 builder: (context, index) {
                   return Mytimer(
                     timer: index,
@@ -176,7 +176,7 @@ late int hideTime;
             ),
           ),
           Text(
-            'Minutes',
+            'Seconds',
             style: GoogleFonts.righteous(
               fontSize: 20.0,
               color: Theme.of(context).primaryColor,

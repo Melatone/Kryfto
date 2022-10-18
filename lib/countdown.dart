@@ -33,7 +33,7 @@ class _CountState extends State<Count> {
  
   int start; 
   _CountState(this.start);
-
+  
   void startTimer(){
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
