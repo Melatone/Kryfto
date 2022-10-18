@@ -79,7 +79,20 @@ bool countDone = false;
       print(result['status']);
       this.setState(() {
         if (msg['status'] == "Success") {
-        showOverlay(context);
+          if(widget.player.Seeker){
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                Rose(points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomcode,
+                        widget.hideLimit, widget.timeLimit,
+                        ),playersItems: widget.playersItems,
+                        timeLimit: widget.timeLimit,
+                  )
+        ));
+          }
+           showOverlay(context);
           
         }
       });
@@ -107,21 +120,13 @@ bool countDone = false;
 
          Navigator.pop(context);
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => widget.player.Seeker
-                ? Rose(points: widget.points,
+            builder: (context) =>
+                 MapPage(points: widget.points,
                     socket: widget.socket,
                     user: widget.user,
                     roomInfo: RoomInfo(widget.points, widget.roomcode,
                         widget.hideLimit, widget.timeLimit,
-                        ),
-                        timeLimit: widget.timeLimit,
-                  )
-                : MapPage(points: widget.points,
-                    socket: widget.socket,
-                    user: widget.user,
-                    roomInfo: RoomInfo(widget.points, widget.roomcode,
-                        widget.hideLimit, widget.timeLimit,
-                        ),
+                        ), playersItems: widget.playersItems,
                         timeLimit: widget.timeLimit,
                   ),
           ));

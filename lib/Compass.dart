@@ -32,9 +32,9 @@ class Rose extends StatefulWidget {
   final IO.Socket socket;
   final User user;
   final RoomInfo roomInfo;
-
+  List<PlayerModel> playersItems;
   final int timeLimit;
-   Rose({Key? key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.timeLimit}) : super(key: key);
+   Rose({Key? key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit}) : super(key: key);
   @override
   State<Rose> createState() => _RoseState(points);
 }
@@ -55,23 +55,40 @@ static const initCameraPosition = CameraPosition(
   Set<Polygon> polygons = {};
   double angle =0;
  LocationData? currentLocation;
-
+ int playerCount =0;
  List<LatLng> hiders = <LatLng>[];
 
- late mp.LatLng closest; 
- late LatLng nearest;
+ late mp.LatLng closest ; 
+ late LatLng nearest ;
  int distance = 0 ;
 
 
 
 @override
 void initState(){
-  getLocation();
+  Location location = Location();
 
+    location.getLocation().then(
+      (location) {
+        currentLocation = location;
+        initCompass();
+      },
+    );
+  
+  getLocation();
+initCounter();
  
   super.initState();
 }
 
+ void initCounter(){
+   playerCount=0;
+   widget.playersItems.forEach((element) { 
+     if(!element.Seeker){
+     playerCount++;
+     }
+   });
+ }
 late Timer timer;
 Duration? current = Duration(minutes:30);
 
@@ -121,6 +138,8 @@ for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
 print(hidden);
 }
+
+
 for(int i =1; i < hiders.length; i ++){
 if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) < 
 mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))){
@@ -190,31 +209,28 @@ void initPlayer(){
     
     print(msg['Location'][0]);
     print(msg['Location'][1]);
-    if(LatLng(msg['Location'][0],msg['Location'][1])!=currentLocation!){
+    
     hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
-    }
+    
 });
 }
 
 void getLocation(){
 Location location = Location();
-location.getLocation().then((location) {
-currentLocation = location;
- initCompass();
-print(currentLocation);
-},
-);
+
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
     calcCompass();
     setState(() {
-      markers.remove("Current Location");
-      markers.add(Marker(markerId:const MarkerId("Current Location"),
+    markers.remove("Current Location");
+         markers.add(Marker(markerId:MarkerId("Current Location"),
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
 
+initCounter();
+initPlayer();
     });
   });
   
@@ -300,7 +316,8 @@ if(!inside){
          child: 
          currentLocation == null ? 
       Center(child: Text("Loading...",style: GoogleFonts.righteous(textStyle: TextStyle(fontSize: 25, color: Theme.of(context).primaryColor) )))
-      :GoogleMap(
+      :Stack(children: [
+      GoogleMap(
         markers: markers,
         polygons: polygons,
         zoomControlsEnabled: true,
@@ -335,6 +352,39 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) ));
   
 }
       ),
+      
+      Container(alignment: Alignment.bottomCenter,child: distance! >5 ? Row(children: [
+      Spacer(),
+        Text("$playerCount",
+      style: GoogleFonts.righteous(textStyle:TextStyle(
+      fontSize: 35,
+      ))),
+      const Icon(Icons.person,size :50),
+      Spacer(),
+      ],
+      ):
+      ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0)),
+            minimumSize: const Size(200, 60),
+            maximumSize: const Size(280, 60),
+            primary: Theme.of(context).primaryColorDark,
+          ),
+          child: Text(
+            "Eliminate",
+            style: GoogleFonts.righteous(
+                textStyle:
+                    TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          ),
+          onPressed: () {
+            
+                   
+          },
+        )
+      ),
+    ],
+    ),
     ),
 
         Spacer(flex: 1),

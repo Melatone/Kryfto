@@ -22,19 +22,17 @@ class End extends StatefulWidget {
  
 final User user;
   final IO.Socket socket;
-  final String roomcode;
-  final List<LatLng> points;
+ 
+  final Duration timeLeft;
   List<PlayerModel> playersItems;
-  final PlayerModel player;
-
+  final int operator;
   End(
       {Key? key,
       required this.user,
       required this.socket,
       required this.playersItems,
-      required this.roomcode, 
-      required this.points,
-      required this.player})
+      required this.timeLeft,
+      required this.operator})
       : super(key: key);
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -47,10 +45,14 @@ final User user;
 
 
   @override
-  State<End> createState() => _EndState();
+  State<End> createState() => _EndState(operator, timeLeft);
 }
 
 class _EndState extends State<End> {
+Duration timeLeft;
+
+  int operator;
+  _EndState(this.operator, this.timeLeft);
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -61,7 +63,7 @@ class _EndState extends State<End> {
     // than having to individually change instances of widgets.
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Center(child:Column(children: <Widget>[
+      body: operator == 0? Center(child:Column(children: <Widget>[
         Spacer(flex:2),
         Text("Game Over",
             style: GoogleFonts.righteous(
@@ -76,10 +78,6 @@ class _EndState extends State<End> {
             style: GoogleFonts.righteous(
                 textStyle: TextStyle(
                     fontSize: 30, color: Theme.of(context).backgroundColor))),
-                    
-               
-            
-       
      Container(
                     alignment: Alignment.center,
                         width: 360,
@@ -98,6 +96,52 @@ class _EndState extends State<End> {
                                 user: widget.user,
                               );
                             })),
+            Spacer(flex:2),
+            ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0)),
+            minimumSize: const Size(250, 80),
+            maximumSize: const Size(250, 80),
+            primary: Theme.of(context).primaryColorDark,
+          ),
+          child: Text(
+            "Home",
+            style: GoogleFonts.righteous(
+                textStyle:
+                    TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GamePage(socket: widget.socket, user: widget.user)));
+                   
+          },
+        ),
+        Spacer(),
+      ],),
+      )
+      :Center(child:Column(children: <Widget>[
+        Spacer(flex:2),
+        Text("Game Over",
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 55, color: Theme.of(context).backgroundColor))),
+                    Text("Seekers Win!",
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 25, color: Theme.of(context).backgroundColor))),
+                    Spacer(),
+                    Text("Time Left:",
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 30, color: Theme.of(context).backgroundColor))),
+  Text(timeLeft.toString().substring(0,timeLeft.toString().length-7),
+            style: GoogleFonts.righteous(
+                textStyle: TextStyle(
+                    fontSize: 50, color: Theme.of(context).backgroundColor))),
             Spacer(flex:2),
             ElevatedButton(
           style: ElevatedButton.styleFrom(

@@ -14,6 +14,7 @@ import 'package:geolocator_android/geolocator_android.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/Model/RoomInfo.dart';
+import 'package:kryfto/end_screen.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
 import 'Model/User.dart';
@@ -30,9 +31,9 @@ class MapPage extends StatefulWidget {
   final IO.Socket socket;
   final User user;
   final RoomInfo roomInfo;
-
-    final int timeLimit;
-  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.timeLimit});
+  List<PlayerModel> playersItems; 
+  final int timeLimit;
+  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit});
  
   @override
   State<MapPage> createState() => _MapPageState(points);
@@ -51,7 +52,7 @@ class _MapPageState extends State<MapPage> {
     int _markerCounter =1;
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
-
+  int playerCount =0;
  LocationData? currentLocation;
   
 
@@ -97,6 +98,7 @@ position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
 drawPoints();
+initCounter();
     });
   });
   
@@ -107,7 +109,26 @@ void initState(){
   
   
   getLocation();
+initCounter();
 
+if(playerCount==0){
+Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+}
+else if(current.inSeconds==0){
+  Navigator.pop(context);
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 0, timeLeft: current
+                  )));
+}
 
   super.initState();
 }
@@ -149,6 +170,15 @@ void _drawPolygon(){
      });
    
       
+ }
+
+ void initCounter(){
+   playerCount=0;
+   widget.playersItems.forEach((element) { 
+     if(!element.Seeker){
+     playerCount++;
+     }
+   });
  }
 
 
@@ -194,8 +224,11 @@ void drawPoints(){
     print(msg['Location'][0]);
     print(msg['Location'][1]);
     if(LatLng(msg['Location'][0],msg['Location'][1])!=markers.where((element){
-      element.infoWindow == InfoWindow(title:'Current Location');
-    }).){
+      if(element.infoWindow == InfoWindow(title:'Current Location')){
+        return true;
+      }
+      return false;
+    })){
     _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
     }
     });
@@ -207,7 +240,7 @@ void drawPoints(){
 
   @override
   void dispose(){
-    _madispose();
+    _mapController.dispose();
     super.dispose();
   }
 
@@ -308,6 +341,14 @@ setState(() {
        ),
       ),
       ),
+      Container(child:Row(children: [
+      
+        Text("$playerCount",
+      style: GoogleFonts.righteous(textStyle:TextStyle(
+      fontSize: 35,
+      ))),
+      const Icon(Icons.person,size :50),
+      ],)),
       Container(height: 100, width:100
 
 
@@ -318,7 +359,14 @@ setState(() {
         onPressed: () {
       
 setState(() {
-  
+   Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+
 });
 },
         child: const Icon(Icons.chat_bubble),

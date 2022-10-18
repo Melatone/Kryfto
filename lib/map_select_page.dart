@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
@@ -246,7 +247,7 @@ class _MapPageSelectState extends State<MapSelectPage> {
                                             if (lat_lng.length > 2) {
 
                                               setState(() {
-                                                Navigator.of(context).pop;
+                                                Navigator.pop(context);
                                               Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
