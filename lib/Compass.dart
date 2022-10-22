@@ -95,7 +95,7 @@ Duration? current = Duration(minutes:30);
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
-
+    Timer loc = new Timer.periodic(Duration(seconds:5), (_) => initPlayer());
 
      
       
@@ -132,10 +132,11 @@ _markerCounter++;
       
  }
 void calcCompass(){
- 
+ initCounter();
 List<mp.LatLng> hidden = <mp.LatLng>[];
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
+  hiders.remove(hiders[i]);
 print(hidden);
 }
 
@@ -197,8 +198,9 @@ polygons.add(Polygon(
   
  }
  void initCompass(){
-   mp.LatLng closest = mp.SphericalUtil.computeOffset(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), 5.5, 0); 
-   nearest = LatLng(closest.latitude,closest.longitude);
+   mp.LatLng close = mp.SphericalUtil.computeOffset(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), 5.5, 0); 
+
+   nearest = LatLng(close.latitude,close.longitude);
   distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
 
  }
@@ -207,8 +209,7 @@ void initPlayer(){
   widget.socket.on("player location", (msg){
       msg= jsonDecode(msg);
     
-    print(msg['Location'][0]);
-    print(msg['Location'][1]);
+   
     
     hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
     _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
@@ -229,8 +230,8 @@ position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
 
-initCounter();
-initPlayer();
+
+
     });
   });
   
