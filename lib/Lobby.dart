@@ -70,7 +70,10 @@ bool countDone = false;
               print(result['Username']);
               print(result['Role']);
               element.Seeker = result['Role'];
-              widget.player.Seeker = result['Role'];
+              if(widget.user.username == result['Username']){
+                 widget.player.Seeker = result['Role'];
+              }
+             
             }
           },
         );
@@ -83,7 +86,7 @@ bool countDone = false;
       this.setState(() {
         if (msg['status'] == "Success") {
           print(widget.player.Seeker);
-          if(widget.player.Seeker){
+          if(widget.player.Seeker == true){
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) =>
                 Rose(points: widget.points,
