@@ -28,12 +28,13 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MapPage extends StatefulWidget {
   final List<LatLng> points;
+  final String roomCode;
   final IO.Socket socket;
   final User user;
   final RoomInfo roomInfo;
   List<PlayerModel> playersItems; 
   final int timeLimit;
-  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit});
+  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit, required this.roomCode});
  
   @override
   State<MapPage> createState() => _MapPageState(points);
@@ -88,7 +89,7 @@ location.onLocationChanged.listen(
     currentLocation= newLoc;
     widget.socket.emit("player location",jsonEncode({
     'Username:': widget.user.username,
-    'Code': widget.user.roomcode,
+    'Code': widget.roomCode,
     'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
     setState(() {
