@@ -65,7 +65,7 @@ Duration current = Duration(minutes: 30);
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
-   
+    Timer loc = new Timer.periodic(Duration(seconds:5), (_) => drawPoints());
     current = Duration(minutes:widget.timeLimit);
   }
   void countDown(){
@@ -87,19 +87,15 @@ Location location = Location();
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
-    widget.socket.emit("player location",jsonEncode({
-    'Username:': widget.user.username,
-    'Code': widget.roomCode,
-    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
-  }));
+    
     setState(() {
       markers.remove("Current Location");
          markers.add(Marker(markerId:MarkerId("Current Location"),
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan) ));
-drawPoints();
-initCounter();
+
+
     });
   });
   
@@ -217,7 +213,12 @@ if(!inside){
 }
 
 void drawPoints(){
-  
+  initCounter();
+  widget.socket.emit("player location",jsonEncode({
+    'Username:': widget.user.username,
+    'Code': widget.roomCode,
+    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
+  }));
   setState(() {
     widget.socket.on("player location", (msg){
       msg= jsonDecode(msg);

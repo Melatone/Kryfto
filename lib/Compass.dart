@@ -132,7 +132,7 @@ _markerCounter++;
       
  }
 void calcCompass(){
-  markers.remove(markers.last);
+ 
 List<mp.LatLng> hidden = <mp.LatLng>[];
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
@@ -147,7 +147,7 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
   print(closest);
     nearest = LatLng(hidden[i].latitude,hidden[i].longitude);
     setState(() {
-      markers.remove("Compass");
+       markers.remove(markers.last);
   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
       angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();  
   _setMarker(nearest);
@@ -160,7 +160,7 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
   print(closest);
   nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
   setState(() {
-    markers.remove("Compass");
+ markers.remove(markers.last);
     distance = mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
       
