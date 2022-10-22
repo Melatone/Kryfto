@@ -132,7 +132,7 @@ _markerCounter++;
       
  }
 void calcCompass(){
-  
+  markers.remove(markers.last);
 List<mp.LatLng> hidden = <mp.LatLng>[];
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
@@ -211,7 +211,7 @@ void initPlayer(){
     print(msg['Location'][1]);
     
     hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
-    
+    _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
 });
 }
 
