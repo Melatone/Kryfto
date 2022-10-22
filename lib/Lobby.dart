@@ -66,6 +66,9 @@ bool countDone = false;
         widget.playersItems.forEach(
           (element) {
             if (element.Username == result['Username']) {
+              print(element.Username);
+              print(result['Username']);
+              print(result['Role']);
               element.Seeker = result['Role'];
               widget.player.Seeker = result['Role'];
             }
@@ -79,6 +82,7 @@ bool countDone = false;
       print(result['status']);
       this.setState(() {
         if (msg['status'] == "Success") {
+          print(widget.player.Seeker);
           if(widget.player.Seeker){
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) =>
