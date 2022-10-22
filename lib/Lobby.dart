@@ -92,8 +92,9 @@ bool countDone = false;
                   )
         ));
           }
+          else{
            showOverlay(context);
-          
+          }
         }
       });
     });

@@ -221,8 +221,7 @@ void drawPoints(){
     widget.socket.on("player location", (msg){
       msg= jsonDecode(msg);
     
-    print(msg['Location'][0]);
-    print(msg['Location'][1]);
+   
     if(LatLng(msg['Location'][0],msg['Location'][1])!=markers.where((element){
       if(element.infoWindow == InfoWindow(title:'Current Location')){
         return true;
