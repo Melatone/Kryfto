@@ -57,7 +57,7 @@ static const initCameraPosition = CameraPosition(
  LocationData? currentLocation;
  int playerCount =0;
  List<LatLng> hiders = <LatLng>[];
-
+late mp.LatLng close;
  late mp.LatLng closest ; 
  late LatLng nearest ;
  int distance = 0 ;
@@ -134,6 +134,7 @@ _markerCounter++;
 void calcCompass(){
  initCounter();
 List<mp.LatLng> hidden = <mp.LatLng>[];
+hidden.clear();
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
   hiders.remove(hiders[i]);
@@ -148,10 +149,10 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
   print(closest);
     nearest = LatLng(hidden[i].latitude,hidden[i].longitude);
     setState(() {
-       markers.remove(markers.last);
+      
   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
       angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();  
-  _setMarker(nearest);
+
   
 });
 }
@@ -161,12 +162,18 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
   print(closest);
   nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
   setState(() {
- markers.remove(markers.last);
-    distance = mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+
+    distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
       
-  _setMarker(nearest);
+  
 });
+}
+else if(nearest == LatLng(close.latitude,close.longitude)) {
+  nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
+  closest = hidden[0];
+   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
 }
 else{
   closest = closest;
@@ -176,7 +183,7 @@ else{
   print(angle);
  FlutterCompass.events!.listen((event) {
     setState(() {
-      heading = event.heading! - angle;
+      heading = event.heading! + angle;
     });
   });
 }
@@ -198,7 +205,7 @@ polygons.add(Polygon(
   
  }
  void initCompass(){
-   mp.LatLng close = mp.SphericalUtil.computeOffset(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), 5.5, 0); 
+   close = mp.SphericalUtil.computeOffset(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!), 5.5, 0); 
 
    nearest = LatLng(close.latitude,close.longitude);
   distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
@@ -212,7 +219,8 @@ void initPlayer(){
    
     
     hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
-    _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
+    markers.remove("Compass Init");
+    
 });
 }
 

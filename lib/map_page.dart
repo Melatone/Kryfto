@@ -224,15 +224,9 @@ void drawPoints(){
       msg= jsonDecode(msg);
     
    
-    if(LatLng(msg['Location'][0],msg['Location'][1])!=markers.where((element){
-      if(element.infoWindow == InfoWindow(title:'Current Location')){
-        return true;
-      }
-      return false;
-    })){
+    if(LatLng(msg['Location'][0],msg['Location'][1])!= LatLng(currentLocation!.latitude!, currentLocation!.longitude!)){
     _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
     }
-    });
 
    
       });
