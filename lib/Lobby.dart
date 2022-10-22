@@ -127,7 +127,7 @@ bool countDone = false;
                     roomInfo: RoomInfo(widget.points, widget.roomcode,
                         widget.hideLimit, widget.timeLimit,
                         ), playersItems: widget.playersItems,
-                        timeLimit: widget.timeLimit,
+                        timeLimit: widget.timeLimit, roomCode: widget.roomcode,
                   ),
           ));
   });
@@ -201,7 +201,7 @@ bool countDone = false;
                 style: ElevatedButton.styleFrom(
                     maximumSize: Size(200, 100),
                     minimumSize: Size(120, 50),
-                    backgroundColor: const Color(0xFF242222),
+               
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25))),
                 child: Text(
@@ -226,7 +226,7 @@ bool countDone = false;
                 style: ElevatedButton.styleFrom(
                     maximumSize: Size(200, 100),
                     minimumSize: Size(120, 50),
-                    backgroundColor: const Color(0xFF242222),
+            
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25))),
                 child: Text(
@@ -250,7 +250,7 @@ bool countDone = false;
             style: ElevatedButton.styleFrom(
                 maximumSize: Size(200, 100),
                 minimumSize: Size(120, 60),
-                backgroundColor: const Color(0xFF242222),
+         
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25))),
             child: Text(
