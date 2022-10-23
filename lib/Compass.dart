@@ -178,6 +178,8 @@ else if(nearest == LatLng(close.latitude,close.longitude)) {
 else{
   closest = closest;
   nearest = nearest;
+  distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
 }
 }
   print(angle);
