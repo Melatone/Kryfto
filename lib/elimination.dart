@@ -9,6 +9,7 @@ import 'package:kryfto/game_page.dart';
 import 'package:kryfto/login_page.dart';
 import 'package:kryfto/map_page.dart';
 import 'package:kryfto/registerpage.dart';
+import 'Model/RoomInfo.dart';
 import 'Model/User.dart';
 import 'Model/player.dart';
 import 'map_select_page.dart';
@@ -19,25 +20,59 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 
 class Elimination extends StatefulWidget {
-  Elimination({Key? key, }): super(key: key);
 
 
   
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+ final List<LatLng> points;
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+  final IO.Socket socket;
+  final User user;
+  final RoomInfo roomInfo;
+  List<PlayerModel> playersItems; 
+  final int timeLimit;
+  Elimination({Key? key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit}) : super(key: key);
 
   @override
   State<Elimination> createState() => _EliminationState();
 }
 
 class _EliminationState extends State<Elimination> {
+
+
+@override
+void initState(){
+
+   widget.socket.on("change role", (msg) {
+      final result = json.decode(msg);
+      this.setState(() {
+        widget.playersItems.forEach(
+          (element) {
+            if (element.Username == result['Username']) {
+              print(element.Username);
+              print(result['Username']);
+              print(result['Role']);
+              element.Seeker = result['Role'];
+              Navigator.pop(context);
+              Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                Rose(points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomInfo.roomCode,
+                        widget.roomInfo.hideTime, widget.timeLimit,
+                        ),playersItems: widget.playersItems,
+                        timeLimit: widget.timeLimit,
+                  )
+        ));
+             
+            }
+          },
+        );
+      });
+    });
+
+  super.initState();
+}
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -87,7 +122,14 @@ class _EliminationState extends State<Elimination> {
                     TextStyle(fontSize: 35, )),
           ),
           onPressed: () {
-            Navigator.pop(context);
+            widget.socket.emit(
+                      "change role",
+                      json.encode({
+                        'Code': widget..roomInfo.roomCode,
+                        'Username': widget.user.username,
+                        'Role': true,
+                      }));
+            
             
                 
                    

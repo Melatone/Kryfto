@@ -29,13 +29,12 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MapPage extends StatefulWidget {
   final List<LatLng> points;
-  final String roomCode;
   final IO.Socket socket;
   final User user;
   final RoomInfo roomInfo;
   List<PlayerModel> playersItems; 
   final int timeLimit;
-  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit, required this.roomCode});
+  MapPage({super.key, required this.points, required this.socket, required this.user, required this.roomInfo, required this.playersItems, required this.timeLimit});
  
   @override
   State<MapPage> createState() => _MapPageState(points);
@@ -137,7 +136,14 @@ else if(current.inSeconds<1){
               print(result['Username']);
              
               Navigator.pop(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  Elimination()));
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  Elimination(points: widget.points,
+                    socket: widget.socket,
+                    user: widget.user,
+                    roomInfo: RoomInfo(widget.points, widget.roomcode,
+                        widget.hideLimit, widget.timeLimit,
+                        ),playersItems: widget.playersItems,
+                        timeLimit: widget.timeLimit,
+                  )));
               }
              
             }

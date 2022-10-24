@@ -140,9 +140,10 @@ void calcCompass(){
  initCounter();
 markers.remove(nearestUser);
 hidden.clear();
+
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
- 
+  
   hiders.clear();
 
 
@@ -179,7 +180,7 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
 
     distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
-      
+        usernames.clear();
   
 });
 }
@@ -187,9 +188,14 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
 else{
   closest = closest;
   nearest = nearest;
-  distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+  nearestUser = nearestUser;
+    usernames.clear();
+  setState(() {
+     distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
-        print(distance);
+    
+  });
+     print(distance);
 }
 
 }
@@ -199,12 +205,29 @@ else if(distance == 0) {
   nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
   closest = hidden[0];
   nearestUser = usernames[0];
-  usernames.clear();
-   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+
+  setState(() {
+      usernames.clear();
+     distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
 
-}
+  });
   
+  
+}
+else if(distance > mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt()){
+nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
+  closest = hidden[0];
+  nearestUser = usernames[0];
+
+  setState(() {
+      usernames.clear();
+     distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
+
+  });
+  }
+ 
  FlutterCompass.events!.listen((event) {
     setState(() {
       heading = event.heading! + angle;
@@ -255,6 +278,7 @@ _setMarker(LatLng(msg['Location'][0],msg['Location'][1]), msg['Username:']);
     usernames.add(msg['Username:']);
     markers.remove("Compass Init");
     calcCompass();
+    usernames.clear();
 });
 }
 
@@ -393,7 +417,7 @@ onMapCreated:(GoogleMapController controller){
 }
       ),
       
-      Container(alignment: Alignment.bottomCenter,child: distance! >5 && distance! >0 ? 
+      Container(alignment: Alignment.bottomCenter,child: distance! <5 && distance! >0 ? 
      ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
@@ -412,6 +436,7 @@ onMapCreated:(GoogleMapController controller){
             widget.socket.emit(
                       "eliminate",
                       json.encode({
+                        'Code': widget.roomInfo.roomCode,
                         'Username': nearestUser,
                       }));
                    
