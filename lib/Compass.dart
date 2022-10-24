@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
+
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -56,11 +58,14 @@ static const initCameraPosition = CameraPosition(
   double angle =0;
  LocationData? currentLocation;
  int playerCount =0;
- List<LatLng> hiders = <LatLng>[];
+List<LatLng> hiders = <LatLng>[];
 late mp.LatLng close;
  late mp.LatLng closest ; 
  late LatLng nearest ;
  int distance = 0 ;
+List<String> usernames = <String>[];
+List<mp.LatLng> hidden = <mp.LatLng>[];
+String nearestUser = "";
 
 
 
@@ -96,7 +101,7 @@ Duration? current = Duration(minutes:30);
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
     Timer check = new Timer.periodic(Duration(seconds:10), (_) => inBounds());
     Timer loc = new Timer.periodic(Duration(seconds:5), (_) => initPlayer());
-
+    
      
       
     
@@ -112,9 +117,9 @@ Duration? current = Duration(minutes:30);
   }
 
   
- void _setMarker(LatLng point){
-   final String markerIdVal = "Player $_markerCounter";
-_markerCounter++;
+ void _setMarker(LatLng point, String val){
+   final String markerIdVal = val;
+
 
    setState(() {
      markers.remove(markers.last);
@@ -133,24 +138,31 @@ _markerCounter++;
  }
 void calcCompass(){
  initCounter();
-List<mp.LatLng> hidden = <mp.LatLng>[];
+markers.remove(nearestUser);
 hidden.clear();
 for(int i=0; i < hiders.length; i++){
   hidden.add(mp.LatLng(hiders[i].latitude, hiders[i].longitude));
-  hiders.remove(hiders[i]);
-print(hidden);
+ 
+  hiders.clear();
+
+
 }
 
-
+if(hiders.length>1){
+   if(markers.length>1){
+     markers.clear();
+   }
 for(int i =1; i < hiders.length; i ++){
 if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) < 
 mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))){
   closest = hidden[i];
-  print(closest);
+  nearestUser = usernames[i];
+  usernames.clear();
+
     nearest = LatLng(hidden[i].latitude,hidden[i].longitude);
     setState(() {
       
-  distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+  distance = mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
       angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();  
 
   
@@ -159,7 +171,9 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
 else if(mp.SphericalUtil.computeDistanceBetween(hidden[i],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)) > 
 mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!))) {
   closest = hidden[0];
-  print(closest);
+  nearestUser = usernames[0];
+  usernames.clear();
+  
   nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
   setState(() {
 
@@ -169,20 +183,28 @@ mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.lat
   
 });
 }
-else if(nearest == LatLng(close.latitude,close.longitude)) {
-  nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
-  closest = hidden[0];
-   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
-    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
-}
+
 else{
   closest = closest;
   nearest = nearest;
-  distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+  distance = mp.SphericalUtil.computeDistanceBetween(closest,mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
     angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
+        print(distance);
 }
+
 }
-  print(angle);
+
+}
+else if(distance == 0) {
+  nearest = LatLng(hidden[0].latitude,hidden[0].longitude);
+  closest = hidden[0];
+  nearestUser = usernames[0];
+  usernames.clear();
+   distance = mp.SphericalUtil.computeDistanceBetween(hidden[0],mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!)).toInt();
+    angle = mp.SphericalUtil.computeHeading(mp.LatLng(currentLocation!.latitude!,currentLocation!.longitude!),closest).toDouble();
+
+}
+  
  FlutterCompass.events!.listen((event) {
     setState(() {
       heading = event.heading! + angle;
@@ -215,14 +237,24 @@ polygons.add(Polygon(
  }
 
 void initPlayer(){
+
+  widget.socket.on("player taunt", (msg){
+    
+msg = jsonDecode(msg);
+nearestUser = msg['Username:'];
+ 
+_setMarker(LatLng(msg['Location'][0],msg['Location'][1]), msg['Username:']);
+ 
+  });
   widget.socket.on("player location", (msg){
       msg= jsonDecode(msg);
     
    
     
     hiders.add(LatLng(msg['Location'][0],msg['Location'][1]));
+    usernames.add(msg['Username:']);
     markers.remove("Compass Init");
-    
+    calcCompass();
 });
 }
 
@@ -232,7 +264,7 @@ Location location = Location();
 location.onLocationChanged.listen(
   (newLoc) { 
     currentLocation= newLoc;
-    calcCompass();
+
     setState(() {
     markers.remove("Current Location");
          markers.add(Marker(markerId:MarkerId("Current Location"),
@@ -350,10 +382,7 @@ onMapCreated:(GoogleMapController controller){
                           zoom: 15)));
   
 
-markers.add(Marker(markerId:const MarkerId("Compass"),
-position: LatLng(nearest!.latitude!,nearest!.longitude!),
-infoWindow: InfoWindow(title: 'Compass Init'),
-icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) ));
+
   setState(() {
     
      _drawPolygon();
@@ -364,17 +393,8 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) ));
 }
       ),
       
-      Container(alignment: Alignment.bottomCenter,child: distance! >5 ? Row(children: [
-      Spacer(),
-        Text("$playerCount",
-      style: GoogleFonts.righteous(textStyle:TextStyle(
-      fontSize: 35,
-      ))),
-      const Icon(Icons.person,size :50),
-      Spacer(),
-      ],
-      ):
-      ElevatedButton(
+      Container(alignment: Alignment.bottomCenter,child: distance! >5 && distance! >0 ? 
+     ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0)),
@@ -389,21 +409,43 @@ icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) ));
                     TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
           ),
           onPressed: () {
-            
+            widget.socket.emit(
+                      "eliminate",
+                      json.encode({
+                        'Username': nearestUser,
+                      }));
                    
           },
-        )
+        ) 
+        : 
+     Row(children: [
+       Spacer(),
+        Text("$playerCount",
+      style: GoogleFonts.righteous(textStyle:TextStyle(
+      fontSize: 35,
+      ))),
+      const Icon(Icons.person,size :50),
+      Spacer(),
+      ],
+      )
+      
       ),
     ],
     ),
     ),
 
         Spacer(flex: 1),
-        Text("Nearest Player: $distance m",
+        Text("Nearest Player: $nearestUser",
       style:
      GoogleFonts.righteous(
     textStyle: TextStyle(
-    fontSize: 25, 
+    fontSize: 20, 
+    color: Theme.of(context).backgroundColor))),
+    Text("$distance m",
+      style:
+     GoogleFonts.righteous(
+    textStyle: TextStyle(
+    fontSize: 30, 
     color: Theme.of(context).backgroundColor))),
         Stack(
           alignment: Alignment.center,

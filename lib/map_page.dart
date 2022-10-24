@@ -14,6 +14,7 @@ import 'package:geolocator_android/geolocator_android.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kryfto/Model/RoomInfo.dart';
+import 'package:kryfto/elimination.dart';
 import 'package:kryfto/end_screen.dart';
 import 'package:kryfto/game_page.dart';
 import 'package:location/location.dart';
@@ -117,7 +118,7 @@ Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
                        operator: 1, timeLeft: current
                   )));
 }
-else if(current.inSeconds==0){
+else if(current.inSeconds<1){
   Navigator.pop(context);
   Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  End(
                     socket: widget.socket,
@@ -126,6 +127,24 @@ else if(current.inSeconds==0){
                        operator: 0, timeLeft: current
                   )));
 }
+ widget.socket.on("eliminate", (msg) {
+      final result = json.decode(msg);
+      this.setState(() {
+        widget.playersItems.forEach(
+          (element) {
+            if (widget.user.username == result['Username']) {
+              print(element.Username);
+              print(result['Username']);
+             
+              Navigator.pop(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  Elimination()));
+              }
+             
+            }
+          
+        );
+      });
+    });
 
   super.initState();
 }
@@ -219,11 +238,13 @@ void drawPoints(){
     'Code': widget.roomCode,
     'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
+  
   setState(() {
     widget.socket.on("player location", (msg){
       msg= jsonDecode(msg);
     
-   
+ 
+  
     if(LatLng(msg['Location'][0],msg['Location'][1])!= LatLng(currentLocation!.latitude!, currentLocation!.longitude!)){
     _setMarker(LatLng(msg['Location'][0],msg['Location'][1]));
     }
@@ -325,7 +346,11 @@ onMapCreated:(GoogleMapController controller){
         child:FloatingActionButton(
       
         onPressed: () {
-        
+        widget.socket.emit("player taunt",jsonEncode({
+    'Username:': widget.user.username,
+    'Code': widget.roomCode,
+    'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
+  }));
 setState(() {
   
 });
