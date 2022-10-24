@@ -135,7 +135,7 @@ bool countDone = false;
                     roomInfo: RoomInfo(widget.points, widget.roomcode,
                         widget.hideLimit, widget.timeLimit,
                         ), playersItems: widget.playersItems,
-                        timeLimit: widget.timeLimit, roomCode: widget.roomcode,
+                        timeLimit: widget.timeLimit, 
                   ),
           ));
   });

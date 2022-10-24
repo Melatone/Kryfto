@@ -139,10 +139,10 @@ else if(current.inSeconds<1){
               Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  Elimination(points: widget.points,
                     socket: widget.socket,
                     user: widget.user,
-                    roomInfo: RoomInfo(widget.points, widget.roomcode,
-                        widget.hideLimit, widget.timeLimit,
+                    roomInfo: RoomInfo(widget.points, widget.roomInfo.roomCode,
+                        widget.roomInfo.hideTime, widget.timeLimit,
                         ),playersItems: widget.playersItems,
-                        timeLimit: widget.timeLimit,
+                        timeLimit: current.inSeconds,
                   )));
               }
              
@@ -241,7 +241,7 @@ void drawPoints(){
   initCounter();
   widget.socket.emit("player location",jsonEncode({
     'Username:': widget.user.username,
-    'Code': widget.roomCode,
+    'Code': widget.roomInfo.roomCode,
     'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
   
@@ -354,7 +354,7 @@ onMapCreated:(GoogleMapController controller){
         onPressed: () {
         widget.socket.emit("player taunt",jsonEncode({
     'Username:': widget.user.username,
-    'Code': widget.roomCode,
+    'Code': widget.roomInfo.roomCode,
     'Location': LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
   }));
 setState(() {
