@@ -58,7 +58,7 @@ static const initCameraPosition = CameraPosition(
   Set<Polygon> polygons = {};
   double angle =0;
  LocationData? currentLocation;
- int playerCount =1;
+ int playerCount =0;
 List<LatLng> hiders = <LatLng>[];
 late mp.LatLng close;
  late mp.LatLng closest ; 
@@ -74,15 +74,7 @@ int eliminations =0;
 @override
 void initState(){
 
-if(playerCount==0){
-Navigator.pop(context);
-Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
-                    socket: widget.socket,
-                    user: widget.user,
-                    playersItems: widget.playersItems,
-                       operator: 1, timeLeft: current
-                  )));
-}
+
 
   Location location = Location();
 
@@ -90,7 +82,7 @@ Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
       (location) {
         currentLocation = location;
         initCompass();
-      },
+      }, 
     );
   
   getLocation();
@@ -361,6 +353,15 @@ await Future.delayed(Duration(seconds:5));
 overlayEntry.remove();
 }
 void inBounds(){
+  if(playerCount==0){
+Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+}
    List<mp.LatLng> mpPoints = <mp.LatLng>[];
    bool inside = true;
   for(int i =0; i < points.length;i++){
@@ -373,6 +374,7 @@ if(!inside){
   setState(() {
     showOverlay(context);
   });
+
 }
 }
 

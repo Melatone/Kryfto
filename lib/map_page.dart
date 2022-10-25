@@ -55,7 +55,7 @@ class _MapPageState extends State<MapPage> {
   Set<Polygon> polygons = {};
   int playerCount =0;
  LocationData? currentLocation;
-  
+  int breaches =0;
 
 
 
@@ -119,15 +119,7 @@ void initState(){
   getLocation();
 initCounter();
 
-if(playerCount==0){
-Navigator.pop(context);
-Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
-                    socket: widget.socket,
-                    user: widget.user,
-                    playersItems: widget.playersItems,
-                       operator: 1, timeLeft: current
-                  )));
-}
+
 
  widget.socket.on("eliminate", (msg) {
       final result = json.decode(msg);
@@ -145,7 +137,7 @@ Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
                     roomInfo: RoomInfo(widget.points, widget.roomInfo.roomCode,
                         widget.roomInfo.hideTime, widget.timeLimit,
                         ),playersItems: widget.playersItems,
-                        timeLimit: current.inMinutes
+                        timeLimit: current.inSeconds
                   )));
               }
              
@@ -223,6 +215,15 @@ await Future.delayed(Duration(seconds:5));
 overlayEntry.remove();
 }
 void inBounds(){
+  if(playerCount==0){
+Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+}
    List<mp.LatLng> mpPoints = <mp.LatLng>[];
    bool inside = true;
   for(int i =0; i < points.length;i++){
@@ -234,7 +235,17 @@ void inBounds(){
 if(!inside){
   setState(() {
     showOverlay(context);
+    breaches++;
   });
+  if(breaches>4){
+Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+  }
 }
 
   
@@ -389,13 +400,7 @@ setState(() {
         onPressed: () {
       
 setState(() {
-   Navigator.pop(context);
-Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
-                    socket: widget.socket,
-                    user: widget.user,
-                    playersItems: widget.playersItems,
-                       operator: 1, timeLeft: current
-                  )));
+   
 
 });
 },
