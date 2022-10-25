@@ -14,6 +14,7 @@ import 'package:location/location.dart';
 import 'Model/RoomInfo.dart';
 import 'Model/User.dart';
 import 'Model/player.dart';
+import 'end_screen.dart';
 import 'game_page.dart';
 import 'map_select_page.dart';
 import 'home_page.dart';
@@ -57,7 +58,7 @@ static const initCameraPosition = CameraPosition(
   Set<Polygon> polygons = {};
   double angle =0;
  LocationData? currentLocation;
- int playerCount =0;
+ int playerCount =1;
 List<LatLng> hiders = <LatLng>[];
 late mp.LatLng close;
  late mp.LatLng closest ; 
@@ -66,11 +67,23 @@ late mp.LatLng close;
 List<String> usernames = <String>[];
 List<mp.LatLng> hidden = <mp.LatLng>[];
 String nearestUser = "";
+int eliminations =0;
 
 
 
 @override
 void initState(){
+
+if(playerCount==0){
+Navigator.pop(context);
+Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 1, timeLeft: current
+                  )));
+}
+
   Location location = Location();
 
     location.getLocation().then(
@@ -95,7 +108,7 @@ initCounter();
    });
  }
 late Timer timer;
-Duration? current = Duration(minutes:30);
+Duration current = Duration(minutes:30);
 
   void startTimer(){
     timer = new Timer.periodic(Duration(seconds: 1), (_) => countDown());
@@ -107,12 +120,21 @@ Duration? current = Duration(minutes:30);
     
     current = Duration(minutes:widget.timeLimit);
   }
-  void countDown(){ 
+  void countDown(){
     final second = 1;
     setState(() {
 
-      final seconds = current!.inSeconds - second;
+      final seconds = current.inSeconds - second;
       current = Duration(seconds: seconds);
+      if(current!.inSeconds<1){
+  Navigator.pop(context);
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 0, timeLeft: current
+                  )));
+}
     });
   }
 
@@ -417,7 +439,7 @@ onMapCreated:(GoogleMapController controller){
 }
       ),
       
-      Container(alignment: Alignment.bottomCenter,child: distance! <5 && distance! >0 ? 
+      Container(alignment: Alignment.bottomCenter,child: distance! >5 && distance! >0 ? 
      ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
@@ -433,6 +455,14 @@ onMapCreated:(GoogleMapController controller){
                     TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
           ),
           onPressed: () {
+            setState(() {
+              hiders.clear();
+              hidden.clear();
+              usernames.clear();
+              distance =0;
+              angle = 0;
+nearestUser = "";
+            });
             widget.socket.emit(
                       "eliminate",
                       json.encode({

@@ -90,11 +90,16 @@ Duration timeLeft;
                             itemCount: widget.playersItems.length,
                             itemBuilder: (context, index) {
                               var currentPlayer = widget.playersItems[index];
+                              if(!currentPlayer.Seeker){
                               return Players(
                                 Username: currentPlayer.Username,
                                 seeker: currentPlayer.Seeker,
                                 user: widget.user,
                               );
+                              }
+                              else{
+                                return Container(child: Text(""));
+                              }
                             })),
             Spacer(flex:2),
             ElevatedButton(

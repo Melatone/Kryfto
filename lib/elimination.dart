@@ -41,20 +41,28 @@ class _EliminationState extends State<Elimination> {
 
 @override
 void initState(){
-
-   widget.socket.on("change role", (msg) {
+ super.initState();
+   widget.socket.on("swap role", (msg) {
       final result = json.decode(msg);
-      this.setState(() {
+      print(result);
+      
         widget.playersItems.forEach(
           (element) {
+            print(element.Username);
             if (element.Username == result['Username']) {
+              setState(() {
               print(element.Username);
               print(result['Username']);
               print(result['Role']);
               element.Seeker = result['Role'];
-              Navigator.pop(context);
-              Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
+              
+             
+            });
+          }
+          }
+        );
+        Navigator.pop(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                 Rose(points: widget.points,
                     socket: widget.socket,
                     user: widget.user,
@@ -62,16 +70,12 @@ void initState(){
                         widget.roomInfo.hideTime, widget.timeLimit,
                         ),playersItems: widget.playersItems,
                         timeLimit: widget.timeLimit,
-                  )
+                  ),
         ));
-             
-            }
-          },
-        );
-      });
+      
     });
 
-  super.initState();
+ 
 }
   @override
   Widget build(BuildContext context) {
@@ -123,9 +127,9 @@ void initState(){
           ),
           onPressed: () {
             widget.socket.emit(
-                      "change role",
+                      "swap role",
                       json.encode({
-                        'Code': widget..roomInfo.roomCode,
+                        'Code': widget.roomInfo.roomCode,
                         'Username': widget.user.username,
                         'Role': true,
                       }));
@@ -151,8 +155,11 @@ void initState(){
                     TextStyle(fontSize: 35)),
           ),
           onPressed: () {
-            Navigator.pop(context);
-            
+             Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GamePage(socket: widget.socket, user: widget.user)));
                 
                    
           },

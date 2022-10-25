@@ -62,7 +62,7 @@ bool countDone = false;
 
     widget.socket.on("change role", (msg) {
       final result = json.decode(msg);
-      this.setState(() {
+      setState(() {
         widget.playersItems.forEach(
           (element) {
             if (element.Username == result['Username']) {

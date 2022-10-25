@@ -74,6 +74,15 @@ Duration current = Duration(minutes: 30);
 
       final seconds = current!.inSeconds - second;
       current = Duration(seconds: seconds);
+      if(current.inSeconds<1){
+  Navigator.pop(context);
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  End(
+                    socket: widget.socket,
+                    user: widget.user,
+                    playersItems: widget.playersItems,
+                       operator: 0, timeLeft: current
+                  )));
+}
     });
   }
 
@@ -89,7 +98,9 @@ location.onLocationChanged.listen(
     currentLocation= newLoc;
     
     setState(() {
+      if(markers.length>0){
       markers.remove("Current Location");
+      }
          markers.add(Marker(markerId:MarkerId("Current Location"),
 position: LatLng(currentLocation!.latitude!,currentLocation!.longitude!),
 infoWindow: InfoWindow(title: 'Current Location'),
@@ -117,15 +128,7 @@ Navigator.of(context).push(MaterialPageRoute(builder :(context)=> End(
                        operator: 1, timeLeft: current
                   )));
 }
-else if(current.inSeconds<1){
-  Navigator.pop(context);
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  End(
-                    socket: widget.socket,
-                    user: widget.user,
-                    playersItems: widget.playersItems,
-                       operator: 0, timeLeft: current
-                  )));
-}
+
  widget.socket.on("eliminate", (msg) {
       final result = json.decode(msg);
       this.setState(() {
@@ -142,7 +145,7 @@ else if(current.inSeconds<1){
                     roomInfo: RoomInfo(widget.points, widget.roomInfo.roomCode,
                         widget.roomInfo.hideTime, widget.timeLimit,
                         ),playersItems: widget.playersItems,
-                        timeLimit: current.inSeconds,
+                        timeLimit: current.inMinutes
                   )));
               }
              
